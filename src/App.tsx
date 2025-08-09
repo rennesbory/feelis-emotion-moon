@@ -24,10 +24,22 @@ import webHappy from '@/assets/videos/web_Animation_background_happy.mp4'
 import webSad from '@/assets/videos/web_Animation_background_sad.mp4'
 import webTired from '@/assets/videos/web_Animation_background_tired.mp4'
 
-// Video import verification
-console.log('✅ All videos successfully imported:', {
-  hero: typeof heroVideo === 'string',
+// Video import verification with actual paths
+console.log('🎬 Video Import Debug:', {
+  heroVideo,
+  heroType: typeof heroVideo,
+  webAngry,
+  webAngryType: typeof webAngry,
+  allGalleryVideos: [webAngry, webAnxious, webCalm, webEmpty, webExcited, webGrateful, webHappy, webSad, webTired],
   galleryCount: [webAngry, webAnxious, webCalm, webEmpty, webExcited, webGrateful, webHappy, webSad, webTired].length
+})
+
+// Test if imports are working - this should log actual file paths in development
+console.log('🔍 Individual Video Paths:', {
+  hero: heroVideo,
+  angry: webAngry,
+  anxious: webAnxious,
+  calm: webCalm
 })
 
 
@@ -86,8 +98,11 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
     return (
       <div className="gallery-video cursor-pointer group relative bg-muted rounded-[20px] aspect-[9/16] flex flex-col items-center justify-center p-4">
         <p className="text-muted-foreground text-sm text-center mb-2">Video Error</p>
-        <p className="text-muted-foreground text-xs text-center opacity-70 mb-3">
+        <p className="text-muted-foreground text-xs text-center opacity-70 mb-2">
           Gallery video {index + 1}
+        </p>
+        <p className="text-muted-foreground text-xs text-center opacity-70 mb-3 break-all">
+          {video.src.substring(0, 50)}...
         </p>
         <Button
           size="sm"
@@ -119,7 +134,13 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
         preload="metadata"
         className="w-full aspect-[9/16] object-cover rounded-[20px]"
         onError={(e) => {
-          console.error(`Gallery video ${index} failed to load:`, e.type)
+          console.error(`Gallery video ${index} failed to load:`, {
+            error: e.type,
+            src: video.src,
+            currentSrc: videoRef.current?.currentSrc,
+            networkState: videoRef.current?.networkState,
+            readyState: videoRef.current?.readyState
+          })
           setHasError(true)
           setIsLoading(false)
         }}
@@ -171,6 +192,22 @@ function App() {
     alt?: string
     index?: number
   } | null>(null)
+
+  // Debug video imports on mount
+  useEffect(() => {
+    console.log('🎥 App mounted - checking video imports:')
+    console.log('Hero video path:', heroVideo)
+    console.log('Gallery video paths:', galleryVideos.map(v => v.src))
+    
+    // Check if any imports are undefined
+    const allVideos = [heroVideo, ...galleryVideos.map(v => v.src)]
+    const failedImports = allVideos.filter(v => !v || v === undefined)
+    if (failedImports.length > 0) {
+      console.error('⚠️ Failed video imports detected:', failedImports.length)
+    } else {
+      console.log('✅ All video imports successful')
+    }
+  }, [])
 
   const galleryVideos = [
     { src: webAngry, alt: 'Angry emotion background animation' },
@@ -420,7 +457,13 @@ function App() {
                     loop
                     preload="metadata"
                     onError={(e) => {
-                      console.error('Hero video failed to load:', e.type)
+                      console.error('Hero video failed to load:', {
+                        error: e.type,
+                        src: heroVideo,
+                        currentSrc: heroVideoRef.current?.currentSrc,
+                        networkState: heroVideoRef.current?.networkState,
+                        readyState: heroVideoRef.current?.readyState
+                      })
                       setHeroVideoError(true)
                     }}
                     onLoadedData={() => {
