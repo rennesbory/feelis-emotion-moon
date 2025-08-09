@@ -9,21 +9,23 @@ import { toast } from 'sonner'
 import { HowItWorks } from '@/components/HowItWorks'
 
 
-// Import all assets using Vite import system for consistent handling
+// Import static assets
 import feelisLogo from '@/assets/images/feelis_logo.png'
-import heroVideo from '@/assets/video/emoly_intro_trim.mp4'
-import webAngry from '@/assets/video/web_Animation_background_angry.mp4'
-import webAnxious from '@/assets/video/web_Animation_background_anxious.mp4'
-import webCalm from '@/assets/video/web_Animation_background_calm.mp4'
-import webEmpty from '@/assets/video/web_Animation_background_empty.mp4'
-import webExcited from '@/assets/video/web_Animation_background_excited.mp4'
-import webGrateful from '@/assets/video/web_Animation_background_grateful.mp4'
-import webHappy from '@/assets/video/web_Animation_background_happy.mp4'
-import webSad from '@/assets/video/web_Animation_background_sad.mp4'
-import webTired from '@/assets/video/web_Animation_background_tired.mp4'
 
-// Debug logging for asset paths
-console.log('=== ASSET IMPORT DEBUG ===')
+// Use public folder for videos to ensure deployment compatibility
+const heroVideo = '/videos/emoly_intro_trim.mp4'
+const webAngry = '/videos/web_Animation_background_angry.mp4'
+const webAnxious = '/videos/web_Animation_background_anxious.mp4'
+const webCalm = '/videos/web_Animation_background_calm.mp4'
+const webEmpty = '/videos/web_Animation_background_empty.mp4'
+const webExcited = '/videos/web_Animation_background_excited.mp4'
+const webGrateful = '/videos/web_Animation_background_grateful.mp4'
+const webHappy = '/videos/web_Animation_background_happy.mp4'
+const webSad = '/videos/web_Animation_background_sad.mp4'
+const webTired = '/videos/web_Animation_background_tired.mp4'
+
+// Debug logging for video paths
+console.log('=== VIDEO PATH DEBUG ===')
 console.log('Hero video:', heroVideo)
 console.log('Gallery videos:', {
   webAngry,
@@ -36,11 +38,6 @@ console.log('Gallery videos:', {
   webSad,
   webTired
 })
-
-// Verify assets are proper URLs
-const allVideos = [heroVideo, webAngry, webAnxious, webCalm, webEmpty, webExcited, webGrateful, webHappy, webSad, webTired]
-console.log('All videos are strings:', allVideos.every(v => typeof v === 'string'))
-console.log('All videos start with blob: or /:', allVideos.every(v => v.startsWith('/') || v.startsWith('blob:')))
 console.log('=== END DEBUG ===')
 
 interface GalleryVideoProps {
@@ -199,37 +196,8 @@ function App() {
 
   console.log('Gallery videos check:', galleryVideos.map(v => ({
     src: v.src,
-    filename: v.src.split('/').pop(),
-    accessible: 'checking...'
+    filename: v.src.split('/').pop()
   })))
-
-  // Test video accessibility
-  const testVideoAccess = async () => {
-    const results = []
-    for (const video of galleryVideos) {
-      try {
-        const response = await fetch(video.src, { method: 'HEAD' })
-        results.push({
-          src: video.src,
-          accessible: response.ok,
-          status: response.status
-        })
-      } catch (error) {
-        results.push({
-          src: video.src,
-          accessible: false,
-          error: error.message
-        })
-      }
-    }
-    console.log('Video accessibility test results:', results)
-    return results
-  }
-
-  // Run accessibility test
-  useEffect(() => {
-    testVideoAccess()
-  }, [])
 
   console.log('Gallery videos:', galleryVideos)
 
