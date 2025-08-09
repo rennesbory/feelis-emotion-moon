@@ -1,27 +1,51 @@
 import { Card } from '@/components/ui/card'
 
-// Step-by-step data with placeholder images since actual screenshots aren't available
+// Step-by-step data with two images per step
 const howItWorksSteps = [
   {
     step: "01",
     title: "Check In With Yourself",
     description: "Start by choosing the feeling that best represents your moment. Our beautiful, expressive characters make it easy to identify and acknowledge your emotions.",
-    imageSrc: "https://picsum.photos/300/600?random=10", // Using placeholder for now
-    alt: "A grid showing nine different emotional characters to choose from."
+    images: [
+      {
+        src: "https://picsum.photos/300/600?random=10",
+        alt: "Emotion selection screen with character grid"
+      },
+      {
+        src: "https://picsum.photos/300/600?random=11", 
+        alt: "Character selection interface"
+      }
+    ]
   },
   {
     step: "02", 
     title: "Reflect in a Cozy Space",
     description: "Write as much or as little as you want. Our thoughtful, context-aware prompts help guide your reflection in a calm, pressure-free environment that adapts to your mood.",
-    imageSrc: "https://picsum.photos/300/600?random=11", // Using placeholder for now
-    alt: "The journaling screen with a gentle writing prompt and a themed background."
+    images: [
+      {
+        src: "https://picsum.photos/300/600?random=12",
+        alt: "Journaling interface with gentle prompts"
+      },
+      {
+        src: "https://picsum.photos/300/600?random=13",
+        alt: "Writing screen with cozy background"
+      }
+    ]
   },
   {
     step: "03",
     title: "Discover Your Patterns", 
     description: "See your emotional world unfold through simple, beautiful charts. Understand your most frequent feelings and discover gentle insights over time.",
-    imageSrc: "https://picsum.photos/300/600?random=12", // Using placeholder for now
-    alt: "A beautiful bar chart showing the distribution of different emotions."
+    images: [
+      {
+        src: "https://picsum.photos/300/600?random=14",
+        alt: "Emotional patterns chart"
+      },
+      {
+        src: "https://picsum.photos/300/600?random=15",
+        alt: "Insights and analytics view"
+      }
+    ]
   }
 ]
 
@@ -29,13 +53,15 @@ interface StepProps {
   step: string
   title: string
   description: string
-  imageSrc: string
-  alt: string
+  images: Array<{
+    src: string
+    alt: string
+  }>
   isReversed?: boolean
 }
 
 // Reusable Step component for each workflow step
-function Step({ step, title, description, imageSrc, alt, isReversed = false }: StepProps) {
+function Step({ step, title, description, images, isReversed = false }: StepProps) {
   const flexDirection = isReversed ? 'lg:flex-row-reverse' : 'lg:flex-row'
 
   return (
@@ -51,15 +77,19 @@ function Step({ step, title, description, imageSrc, alt, isReversed = false }: S
         </p>
       </div>
 
-      {/* Image with Device Mockup */}
-      <div className="lg:w-1/2 w-full max-w-sm">
-        <div className="device-frame rounded-3xl p-3 shadow-2xl">
-          <img 
-            src={imageSrc} 
-            alt={alt} 
-            className="w-full h-full object-cover rounded-xl" 
-            loading="lazy"
-          />
+      {/* Side-by-side Images */}
+      <div className="lg:w-1/2 w-full">
+        <div className="flex gap-6 justify-center">
+          {images.map((image, index) => (
+            <div key={index} className="device-frame rounded-3xl p-3 shadow-2xl w-full max-w-[200px]">
+              <img 
+                src={image.src} 
+                alt={image.alt} 
+                className="w-full h-auto object-cover rounded-xl" 
+                loading="lazy"
+              />
+            </div>
+          ))}
         </div>
       </div>
     </div>
@@ -91,8 +121,7 @@ export function HowItWorks() {
               step={item.step}
               title={item.title}
               description={item.description}
-              imageSrc={item.imageSrc}
-              alt={item.alt}
+              images={item.images}
               isReversed={index % 2 !== 0}
             />
           ))}
