@@ -305,7 +305,7 @@ function App() {
             {galleryImages.map((image, index) => (
               <div 
                 key={index}
-                className="relative overflow-hidden rounded-2xl shadow-lg cursor-pointer group"
+                className="gallery-image cursor-pointer group"
                 onClick={() => openLightbox({
                   type: 'image',
                   src: image.src,
@@ -316,7 +316,6 @@ function App() {
                 <img
                   src={image.src}
                   alt={image.alt}
-                  className="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-105"
                   loading="lazy"
                 />
               </div>

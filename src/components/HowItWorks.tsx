@@ -85,13 +85,12 @@ function Step({ step, title, description, images, isReversed = false }: StepProp
 
       {/* Side-by-side Images */}
       <div className="lg:w-1/2 w-full">
-        <div className="flex gap-6 justify-center">
+        <div className="step-images">
           {images.map((image, index) => (
-            <div key={index} className="device-frame rounded-3xl p-3 shadow-2xl w-full max-w-[200px]">
+            <div key={index} className="step-image">
               <img 
                 src={image.src} 
                 alt={image.alt} 
-                className="w-full h-auto object-cover rounded-xl" 
                 loading="lazy"
               />
             </div>
