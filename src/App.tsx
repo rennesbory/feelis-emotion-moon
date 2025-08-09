@@ -7,7 +7,7 @@ import { Play, X, Download, ArrowRight, ArrowLeft, Pause } from '@phosphor-icons
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 import { HowItWorks } from '@/components/HowItWorks'
-import { VideoTest } from '@/components/VideoTest'
+
 
 // Import image assets properly using Vite import system
 import feelisLogo from '@/assets/images/feelis_logo.png'
@@ -49,25 +49,17 @@ interface GalleryVideoProps {
 function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
   const [isPlaying, setIsPlaying] = useState(false)
   const [hasError, setHasError] = useState(false)
-  const [isLoaded, setIsLoaded] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
-  const [retryCount, setRetryCount] = useState(0)
   const videoRef = useRef<HTMLVideoElement>(null)
 
   const togglePlayPause = (e: React.MouseEvent) => {
     e.stopPropagation()
     const videoElement = videoRef.current
-    if (!videoElement || !isLoaded) return
+    if (!videoElement) return
 
     if (isPlaying) {
       videoElement.pause()
-      setIsPlaying(false)
     } else {
-      videoElement.play()
-        .then(() => setIsPlaying(true))
-        .catch((error) => {
-          console.error('Failed to play video:', error)
-        })
+      videoElement.play().catch(() => {})
     }
   }
 
@@ -80,85 +72,6 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
     })
   }
 
-  const handleVideoError = (e: React.SyntheticEvent<HTMLVideoElement>) => {
-    const target = e.target as HTMLVideoElement
-    console.error(`Failed to load video: ${video.src}`)
-    console.error('Video error details:', {
-      src: video.src,
-      actualSrc: target.src,
-      currentSrc: target.currentSrc,
-      networkState: target.networkState,
-      readyState: target.readyState,
-      error: target.error?.code,
-      errorMessage: target.error?.message,
-      retryCount
-    })
-    
-    setHasError(true)
-    setIsLoading(false)
-  }
-
-  const handleVideoLoadedData = () => {
-    console.log(`Video loaded successfully: ${video.src}`)
-    setHasError(false)
-    setIsLoaded(true)
-    setIsLoading(false)
-  }
-
-  const handleCanPlay = () => {
-    console.log(`Video can play: ${video.src}`)
-    setIsLoaded(true)
-    setIsLoading(false)
-    
-    // Try to auto-play after a short delay
-    setTimeout(() => {
-      const videoElement = videoRef.current
-      if (videoElement && videoElement.readyState >= 3) {
-        videoElement.play()
-          .then(() => {
-            console.log(`Auto-play started for: ${video.src}`)
-            setIsPlaying(true)
-          })
-          .catch((error) => {
-            console.log(`Auto-play failed for: ${video.src}`, error)
-            setIsPlaying(false)
-          })
-      }
-    }, 200)
-  }
-
-  const retryVideoLoad = () => {
-    if (retryCount >= 3) {
-      console.log(`Max retries reached for: ${video.src}`)
-      return
-    }
-    
-    setIsLoaded(false)
-    setIsLoading(true)
-    setHasError(false)
-    setRetryCount(prev => prev + 1)
-    
-    const videoElement = videoRef.current
-    if (videoElement) {
-      // Clear current source and reload
-      videoElement.src = ''
-      setTimeout(() => {
-        videoElement.src = video.src
-        videoElement.load()
-      }, 100)
-    }
-  }
-
-  // Initialize video on mount and when src changes
-  useEffect(() => {
-    const videoElement = videoRef.current
-    if (videoElement && video.src) {
-      console.log(`Initializing video: ${video.src}`)
-      videoElement.src = video.src
-      videoElement.load()
-    }
-  }, [video.src, retryCount])
-
   if (hasError) {
     return (
       <div className="gallery-video cursor-pointer group relative bg-muted rounded-[20px] aspect-[9/16] flex flex-col items-center justify-center p-4">
@@ -166,34 +79,6 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
         <p className="text-muted-foreground text-xs mt-1 text-center opacity-70">
           {video.src.split('/').pop()}
         </p>
-        <p className="text-muted-foreground text-xs text-center opacity-50">
-          Retries: {retryCount}/3
-        </p>
-        {retryCount < 3 && (
-          <button 
-            onClick={retryVideoLoad}
-            className="mt-2 px-3 py-1 text-xs bg-muted-foreground/20 rounded-full hover:bg-muted-foreground/30 transition-colors"
-          >
-            Retry
-          </button>
-        )}
-      </div>
-    )
-  }
-
-  if (isLoading) {
-    return (
-      <div className="gallery-video cursor-pointer group relative bg-muted rounded-[20px] aspect-[9/16] flex flex-col items-center justify-center p-4">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-        <p className="text-muted-foreground text-sm text-center mt-2">Loading video...</p>
-        <p className="text-muted-foreground text-xs mt-1 text-center opacity-70">
-          {video.src.split('/').pop()}
-        </p>
-        {retryCount > 0 && (
-          <p className="text-muted-foreground text-xs text-center opacity-50">
-            Attempt: {retryCount + 1}
-          </p>
-        )}
       </div>
     )
   }
@@ -202,18 +87,13 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
     <div className="gallery-video cursor-pointer group relative" onClick={handleVideoClick}>
       <video
         ref={videoRef}
+        src={video.src}
         muted
         loop
         playsInline
-        preload="metadata"
+        autoPlay
         className="w-full aspect-[9/16] object-cover rounded-[20px]"
-        onError={handleVideoError}
-        onLoadedData={handleVideoLoadedData}
-        onCanPlay={handleCanPlay}
-        onLoadStart={() => {
-          console.log(`Loading video: ${video.src}`)
-          setIsLoading(true)
-        }}
+        onError={() => setHasError(true)}
         onPause={() => setIsPlaying(false)}
         onPlay={() => setIsPlaying(true)}
       >
@@ -221,20 +101,18 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
       </video>
 
       {/* Play/Pause Button */}
-      {isLoaded && (
-        <Button
-          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 glass-card"
-          size="icon"
-          variant="outline"
-          onClick={togglePlayPause}
-        >
-          {isPlaying ? (
-            <Pause className="w-4 h-4" />
-          ) : (
-            <Play className="w-4 h-4" />
-          )}
-        </Button>
-      )}
+      <Button
+        className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 glass-card"
+        size="icon"
+        variant="outline"
+        onClick={togglePlayPause}
+      >
+        {isPlaying ? (
+          <Pause className="w-4 h-4" />
+        ) : (
+          <Play className="w-4 h-4" />
+        )}
+      </Button>
     </div>
   )
 }
@@ -782,11 +660,9 @@ function App() {
           </div>
         </DialogContent>
       </Dialog>
-
-      {/* Video Test Component - Remove this in production */}
-      <VideoTest />
     </div>
   )
+}
 }
 
 export default App
