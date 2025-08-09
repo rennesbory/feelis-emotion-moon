@@ -7,21 +7,22 @@ import { Play, X, Download, ArrowRight, ArrowLeft, Pause } from '@phosphor-icons
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 import { HowItWorks } from '@/components/HowItWorks'
+import { VideoTest } from '@/components/VideoTest'
 
 // Import image assets properly using Vite import system
 import feelisLogo from '@/assets/images/feelis_logo.png'
 
-// Import video assets properly using Vite import system
-import heroVideo from '@/assets/video/emoly_intro_trim.mp4'
-import webAngry from '@/assets/video/web_Animation_background_angry.mp4'
-import webAnxious from '@/assets/video/web_Animation_background_anxious.mp4'
-import webCalm from '@/assets/video/web_Animation_background_calm.mp4'
-import webEmpty from '@/assets/video/web_Animation_background_empty.mp4'
-import webExcited from '@/assets/video/web_Animation_background_excited.mp4'
-import webGrateful from '@/assets/video/web_Animation_background_grateful.mp4'
-import webHappy from '@/assets/video/web_Animation_background_happy.mp4'
-import webSad from '@/assets/video/web_Animation_background_sad.mp4'
-import webTired from '@/assets/video/web_Animation_background_tired.mp4'
+// For videos, let's try using public folder paths to see if that resolves the issue
+const heroVideo = '/videos/emoly_intro_trim.mp4'
+const webAngry = '/videos/web_Animation_background_angry.mp4'
+const webAnxious = '/videos/web_Animation_background_anxious.mp4'
+const webCalm = '/videos/web_Animation_background_calm.mp4'
+const webEmpty = '/videos/web_Animation_background_empty.mp4'
+const webExcited = '/videos/web_Animation_background_excited.mp4'
+const webGrateful = '/videos/web_Animation_background_grateful.mp4'
+const webHappy = '/videos/web_Animation_background_happy.mp4'
+const webSad = '/videos/web_Animation_background_sad.mp4'
+const webTired = '/videos/web_Animation_background_tired.mp4'
 
 // Debug logging for asset paths
 console.log('Asset paths check:', {
@@ -36,7 +37,7 @@ console.log('Asset paths check:', {
   webHappy,
   webSad,
   webTired,
-  'All assets imported successfully': true
+  'Using public folder paths': true
 })
 
 interface GalleryVideoProps {
@@ -50,12 +51,13 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
   const [hasError, setHasError] = useState(false)
   const [isLoaded, setIsLoaded] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
+  const [retryCount, setRetryCount] = useState(0)
   const videoRef = useRef<HTMLVideoElement>(null)
 
   const togglePlayPause = (e: React.MouseEvent) => {
     e.stopPropagation()
     const videoElement = videoRef.current
-    if (!videoElement) return
+    if (!videoElement || !isLoaded) return
 
     if (isPlaying) {
       videoElement.pause()
@@ -65,7 +67,6 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
         .then(() => setIsPlaying(true))
         .catch((error) => {
           console.error('Failed to play video:', error)
-          setHasError(true)
         })
     }
   }
@@ -89,7 +90,8 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
       networkState: target.networkState,
       readyState: target.readyState,
       error: target.error?.code,
-      errorMessage: target.error?.message
+      errorMessage: target.error?.message,
+      retryCount
     })
     
     setHasError(true)
@@ -101,7 +103,14 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
     setHasError(false)
     setIsLoaded(true)
     setIsLoading(false)
+  }
+
+  const handleCanPlay = () => {
+    console.log(`Video can play: ${video.src}`)
+    setIsLoaded(true)
+    setIsLoading(false)
     
+    // Try to auto-play after a short delay
     setTimeout(() => {
       const videoElement = videoRef.current
       if (videoElement && videoElement.readyState >= 3) {
@@ -115,28 +124,40 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
             setIsPlaying(false)
           })
       }
-    }, 100)
+    }, 200)
   }
 
   const retryVideoLoad = () => {
+    if (retryCount >= 3) {
+      console.log(`Max retries reached for: ${video.src}`)
+      return
+    }
+    
     setIsLoaded(false)
     setIsLoading(true)
     setHasError(false)
+    setRetryCount(prev => prev + 1)
+    
     const videoElement = videoRef.current
     if (videoElement) {
-      videoElement.load()
+      // Clear current source and reload
+      videoElement.src = ''
+      setTimeout(() => {
+        videoElement.src = video.src
+        videoElement.load()
+      }, 100)
     }
   }
 
-  // Initialize video on mount
+  // Initialize video on mount and when src changes
   useEffect(() => {
     const videoElement = videoRef.current
-    if (videoElement) {
-      // Set the source and try to load
+    if (videoElement && video.src) {
+      console.log(`Initializing video: ${video.src}`)
       videoElement.src = video.src
       videoElement.load()
     }
-  }, [video.src])
+  }, [video.src, retryCount])
 
   if (hasError) {
     return (
@@ -145,12 +166,17 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
         <p className="text-muted-foreground text-xs mt-1 text-center opacity-70">
           {video.src.split('/').pop()}
         </p>
-        <button 
-          onClick={retryVideoLoad}
-          className="mt-2 px-3 py-1 text-xs bg-muted-foreground/20 rounded-full hover:bg-muted-foreground/30 transition-colors"
-        >
-          Retry
-        </button>
+        <p className="text-muted-foreground text-xs text-center opacity-50">
+          Retries: {retryCount}/3
+        </p>
+        {retryCount < 3 && (
+          <button 
+            onClick={retryVideoLoad}
+            className="mt-2 px-3 py-1 text-xs bg-muted-foreground/20 rounded-full hover:bg-muted-foreground/30 transition-colors"
+          >
+            Retry
+          </button>
+        )}
       </div>
     )
   }
@@ -163,6 +189,11 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
         <p className="text-muted-foreground text-xs mt-1 text-center opacity-70">
           {video.src.split('/').pop()}
         </p>
+        {retryCount > 0 && (
+          <p className="text-muted-foreground text-xs text-center opacity-50">
+            Attempt: {retryCount + 1}
+          </p>
+        )}
       </div>
     )
   }
@@ -174,34 +205,36 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
         muted
         loop
         playsInline
+        preload="metadata"
         className="w-full aspect-[9/16] object-cover rounded-[20px]"
         onError={handleVideoError}
         onLoadedData={handleVideoLoadedData}
+        onCanPlay={handleCanPlay}
         onLoadStart={() => {
           console.log(`Loading video: ${video.src}`)
           setIsLoading(true)
         }}
-        onCanPlay={() => {
-          console.log(`Can play video: ${video.src}`)
-        }}
+        onPause={() => setIsPlaying(false)}
+        onPlay={() => setIsPlaying(true)}
       >
-        <source src={video.src} type="video/mp4" />
         Your browser does not support the video tag.
       </video>
 
       {/* Play/Pause Button */}
-      <Button
-        className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-        size="icon"
-        variant="outline"
-        onClick={togglePlayPause}
-      >
-        {isPlaying ? (
-          <Pause className="w-4 h-4" />
-        ) : (
-          <Play className="w-4 h-4" />
-        )}
-      </Button>
+      {isLoaded && (
+        <Button
+          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 glass-card"
+          size="icon"
+          variant="outline"
+          onClick={togglePlayPause}
+        >
+          {isPlaying ? (
+            <Pause className="w-4 h-4" />
+          ) : (
+            <Play className="w-4 h-4" />
+          )}
+        </Button>
+      )}
     </div>
   )
 }
@@ -460,6 +493,7 @@ function App() {
                 ) : (
                   <video
                     ref={heroVideoRef}
+                    src={heroVideo}
                     className="w-full rounded-[20px]"
                     muted
                     playsInline
@@ -490,7 +524,6 @@ function App() {
                       console.log('Hero video can play')
                     }}
                   >
-                    <source src={heroVideo} type="video/mp4" />
                     Your browser does not support the video tag.
                   </video>
                 )}
@@ -749,6 +782,9 @@ function App() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Video Test Component - Remove this in production */}
+      <VideoTest />
     </div>
   )
 }
