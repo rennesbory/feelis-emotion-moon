@@ -24,23 +24,13 @@ import webHappy from '@/assets/videos/web_Animation_background_happy.mp4'
 import webSad from '@/assets/videos/web_Animation_background_sad.mp4'
 import webTired from '@/assets/videos/web_Animation_background_tired.mp4'
 
-// Video import verification with actual paths
-console.log('🎬 Video Import Debug:', {
-  heroVideo,
-  heroType: typeof heroVideo,
-  webAngry,
-  webAngryType: typeof webAngry,
-  allGalleryVideos: [webAngry, webAnxious, webCalm, webEmpty, webExcited, webGrateful, webHappy, webSad, webTired],
-  galleryCount: [webAngry, webAnxious, webCalm, webEmpty, webExcited, webGrateful, webHappy, webSad, webTired].length
-})
-
-// Test if imports are working - this should log actual file paths in development
-console.log('🔍 Individual Video Paths:', {
-  hero: heroVideo,
-  angry: webAngry,
-  anxious: webAnxious,
-  calm: webCalm
-})
+// Debug: Log video paths in production to verify they're correct
+if (import.meta.env.PROD) {
+  console.log('🎬 Production Video Paths:', {
+    heroVideo,
+    galleryVideos: [webAngry, webAnxious, webCalm, webEmpty, webExcited, webGrateful, webHappy, webSad, webTired]
+  })
+}
 
 
 
