@@ -41,7 +41,7 @@ console.log('Gallery videos:', {
 const allVideos = [heroVideo, webAngry, webAnxious, webCalm, webEmpty, webExcited, webGrateful, webHappy, webSad, webTired]
 console.log('All videos are strings:', allVideos.every(v => typeof v === 'string'))
 console.log('All videos start with blob: or /:', allVideos.every(v => v.startsWith('/') || v.startsWith('blob:')))
-console.log('=== END DEBUG ==='))
+console.log('=== END DEBUG ===')
 
 interface GalleryVideoProps {
   video: { src: string; alt: string }
