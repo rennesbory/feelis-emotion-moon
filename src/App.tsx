@@ -8,7 +8,6 @@ import { cn } from '@/lib/utils'
 import { toast, Toaster } from 'sonner'
 import { HowItWorks } from '@/components/HowItWorks'
 
-
 // Import static assets
 import feelisLogo from '@/assets/images/feelis_logo.png'
 
@@ -23,14 +22,6 @@ import webGrateful from '@/assets/videos/web_Animation_background_grateful.mp4'
 import webHappy from '@/assets/videos/web_Animation_background_happy.mp4'
 import webSad from '@/assets/videos/web_Animation_background_sad.mp4'
 import webTired from '@/assets/videos/web_Animation_background_tired.mp4'
-
-// Debug: Log video paths in production to verify they're correct
-if (import.meta.env.PROD) {
-  console.log('🎬 Production Video Paths:', {
-    heroVideo,
-    galleryVideos: [webAngry, webAnxious, webCalm, webEmpty, webExcited, webGrateful, webHappy, webSad, webTired]
-  })
-}
 
 
 
@@ -72,7 +63,6 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
 
   const handleRetry = (e: React.MouseEvent) => {
     e.stopPropagation()
-    console.log('Retrying video:', video.src)
     setHasError(false)
     setIsLoading(true)
     const videoElement = videoRef.current
@@ -81,75 +71,57 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
     }
   }
 
-  // Log video loading for debugging
-  console.log(`🎬 Loading gallery video ${index}`)
-
-  if (hasError) {
-    return (
-      <div className="gallery-video cursor-pointer group relative bg-muted rounded-[20px] aspect-[9/16] flex flex-col items-center justify-center p-4">
-        <p className="text-muted-foreground text-sm text-center mb-2">Video Error</p>
-        <p className="text-muted-foreground text-xs text-center opacity-70 mb-2">
-          Gallery video {index + 1}
-        </p>
-        <p className="text-muted-foreground text-xs text-center opacity-70 mb-3 break-all">
-          {video.src.substring(0, 50)}...
-        </p>
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={handleRetry}
-          className="text-xs"
-        >
-          Retry
-        </Button>
-      </div>
-    )
-  }
-
   return (
     <div className="gallery-video cursor-pointer group relative" onClick={handleVideoClick}>
       {isLoading && (
         <div className="absolute inset-0 bg-muted rounded-[20px] flex items-center justify-center z-10">
-          <p className="text-muted-foreground text-sm">Loading...</p>
+          <p className="text-muted-foreground text-sm">Loading video...</p>
         </div>
       )}
       
-      <video
-        ref={videoRef}
-        src={video.src}
-        muted
-        loop
-        playsInline
-        autoPlay
-        preload="metadata"
-        className="w-full aspect-[9/16] object-cover rounded-[20px]"
-        onError={(e) => {
-          console.error(`Gallery video ${index} failed to load:`, {
-            error: e.type,
-            src: video.src,
-            currentSrc: videoRef.current?.currentSrc,
-            networkState: videoRef.current?.networkState,
-            readyState: videoRef.current?.readyState
-          })
-          setHasError(true)
-          setIsLoading(false)
-        }}
-        onLoadedData={() => {
-          console.log(`✅ Gallery video ${index} loaded successfully`)
-          setIsLoading(false)
-          setHasError(false)
-        }}
-        onLoadStart={() => {
-          setIsLoading(true)
-        }}
-        onCanPlay={() => {
-          setIsLoading(false)
-        }}
-        onPause={() => setIsPlaying(false)}
-        onPlay={() => setIsPlaying(true)}
-      >
-        Your browser does not support the video tag.
-      </video>
+      {hasError ? (
+        <div className="w-full aspect-[9/16] bg-muted rounded-[20px] flex flex-col items-center justify-center p-4">
+          <p className="text-muted-foreground text-sm text-center mb-2">Video Error</p>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={handleRetry}
+            className="text-xs"
+          >
+            Retry
+          </Button>
+        </div>
+      ) : (
+        <video
+          ref={videoRef}
+          src={video.src}
+          muted
+          loop
+          playsInline
+          autoPlay
+          preload="metadata"
+          className="w-full aspect-[9/16] object-cover rounded-[20px]"
+          onError={() => {
+            console.error(`Gallery video ${index} failed to load:`, video.src)
+            setHasError(true)
+            setIsLoading(false)
+          }}
+          onLoadedData={() => {
+            setIsLoading(false)
+            setHasError(false)
+          }}
+          onLoadStart={() => {
+            setIsLoading(true)
+          }}
+          onCanPlay={() => {
+            setIsLoading(false)
+          }}
+          onPause={() => setIsPlaying(false)}
+          onPlay={() => setIsPlaying(true)}
+        >
+          Your browser does not support the video tag.
+        </video>
+      )}
 
       {/* Play/Pause Button */}
       {!isLoading && !hasError && (
@@ -185,13 +157,8 @@ function App() {
 
   // Debug video imports on mount
   useEffect(() => {
-    console.log('🎥 App mounted - checking video imports:')
-    console.log('Hero video path:', heroVideo)
-    console.log('Gallery video paths:', galleryVideos.map(v => v.src))
-    
-    // Check if any imports are undefined
     const allVideos = [heroVideo, ...galleryVideos.map(v => v.src)]
-    const failedImports = allVideos.filter(v => !v || v === undefined)
+    const failedImports = allVideos.filter(v => !v || v === undefined || v === '')
     if (failedImports.length > 0) {
       console.error('⚠️ Failed video imports detected:', failedImports.length)
     } else {
@@ -300,9 +267,6 @@ function App() {
   useEffect(() => {
     const video = heroVideoRef.current
     if (!video) return
-
-    // Debug logging
-    console.log('🎬 Hero video ready')
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -425,9 +389,7 @@ function App() {
                     </p>
                     <button 
                       onClick={() => {
-                        console.log('Retrying hero video load...')
                         setHeroVideoError(false)
-                        // Try to reload the video
                         const video = heroVideoRef.current
                         if (video) {
                           video.load()
@@ -448,17 +410,10 @@ function App() {
                     loop
                     preload="metadata"
                     onError={(e) => {
-                      console.error('Hero video failed to load:', {
-                        error: e.type,
-                        src: heroVideo,
-                        currentSrc: heroVideoRef.current?.currentSrc,
-                        networkState: heroVideoRef.current?.networkState,
-                        readyState: heroVideoRef.current?.readyState
-                      })
+                      console.error('Hero video failed to load:', heroVideo)
                       setHeroVideoError(true)
                     }}
                     onLoadedData={() => {
-                      console.log('✅ Hero video loaded successfully')
                       setHeroVideoError(false)
                       // Try to auto-play
                       const video = heroVideoRef.current
