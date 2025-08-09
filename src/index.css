@@ -151,6 +151,7 @@ body {
   border-radius: 20px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
 }
 
 .gallery-video:hover {
@@ -164,6 +165,20 @@ body {
   object-fit: cover;
   border-radius: 12px;
   display: block;
+}
+
+/* Center the play/pause button and hide it initially */
+.gallery-video .absolute {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+/* Show the button on hover */
+.gallery-video:hover .absolute {
+  opacity: 1;
 }
 
 /* Hero video styling with rounded corners and white background */

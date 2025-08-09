@@ -69,7 +69,7 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
       <Button
         size="icon"
         variant="outline"
-        className="absolute top-4 right-4 rounded-full glass-card opacity-70 hover:opacity-100 transition-opacity"
+        className="absolute rounded-full glass-card"
         onClick={togglePlayPause}
       >
         {isPlaying ? (
