@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 import { HowItWorks } from '@/components/HowItWorks'
 import heroVideo from '@/assets/video/emoly_intro_trim.mp4'
+import feelisLogo from '@/assets/images/feelis_logo.png'
 import webAngry from '@/assets/video/web_Animation_background_angry.mp4'
 import webAnxious from '@/assets/video/web_Animation_background_anxious.mp4'
 import webCalm from '@/assets/video/web_Animation_background_calm.mp4'
@@ -225,9 +226,11 @@ function App() {
               onClick={() => scrollToSection('home')} 
               className="flex items-center gap-3 font-bold text-lg"
             >
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center text-primary-foreground font-bold shadow-lg">
-                F
-              </div>
+              <img 
+                src={feelisLogo} 
+                alt="Feelis logo" 
+                className="w-9 h-9 rounded-xl"
+              />
               Feelis
             </button>
             
@@ -469,9 +472,11 @@ function App() {
           <div className="grid md:grid-cols-3 gap-8">
             <div>
               <div className="flex items-center gap-3 font-bold text-lg mb-4">
-                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center text-primary-foreground font-bold">
-                  F
-                </div>
+                <img 
+                  src={feelisLogo} 
+                  alt="Feelis logo" 
+                  className="w-9 h-9 rounded-xl"
+                />
                 Feelis
               </div>
               <p className="text-muted-foreground mb-4">
