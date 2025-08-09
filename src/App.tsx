@@ -602,6 +602,8 @@ function App() {
         </div>
       </section>
 
+      {/* Download Section */}
+      <section id="download" className="py-20 px-6">
         <div className="container mx-auto max-w-2xl text-center">
           <h2 className="text-3xl md:text-5xl font-bold mb-6">
             Get Feelis
@@ -612,10 +614,9 @@ function App() {
 
           <form onSubmit={handleEmailSubmit} className="glass-card p-4 rounded-2xl flex gap-3 items-center mb-6">
             <Input
-          <form onSubmit={handleEmailSubmit} className="glass-card p-4 rounded-2xl flex gap-3 items-center mb-6">
-            <Input
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              placeholder="you@email.com"
               className="flex-1 border-0 bg-transparent"
               required
             />
