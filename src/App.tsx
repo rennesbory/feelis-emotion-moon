@@ -109,7 +109,7 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
           .then(() => {
             console.log(`Auto-play started for: ${video.src}`)
             setIsPlaying(true)
-            setIsPlaying(true)
+          })
           .catch((error) => {
             console.log(`Auto-play failed for: ${video.src}`, error)
             setIsPlaying(false)
@@ -117,28 +117,27 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
       }
     }, 100)
   }
-  }
 
   const retryVideoLoad = () => {
+    setHasError(false)
     setIsLoaded(false)
     setIsLoading(true)
     const videoElement = videoRef.current
     if (videoElement) {
       videoElement.load()
+    }
   }
 
-  }/ Initialize video on mount
-(() => {
+  // Initialize video on mount
+  useEffect(() => {
+    const videoElement = videoRef.current
+    if (videoElement) {
       // Set the source and try to load
       videoElement.src = video.src
       videoElement.load()
     }
   }, [video.src, isLoaded, hasError])
 
-  if (hasError) {
-    return (
-      <div className="gallery-video cursor-pointer group relative bg-muted rounded-[20px] aspect-[9/16] flex flex-col items-center justify-center p-4">
-        <p className="text-muted-foreground text-sm text-center">Video unavailable</p>
   if (hasError) {
     return (
       <div className="gallery-video cursor-pointer group relative bg-muted rounded-[20px] aspect-[9/16] flex flex-col items-center justify-center p-4">
@@ -152,6 +151,10 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
         >
           Retry
         </button>
+      </div>
+    )
+  }
+
   if (isLoading) {
     return (
       <div className="gallery-video cursor-pointer group relative bg-muted rounded-[20px] aspect-[9/16] flex flex-col items-center justify-center p-4">
@@ -171,7 +174,7 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
         muted
         loop
         playsInline
-        className="w-full aspect-[9/16] object-cover"
+        className="w-full aspect-[9/16] object-cover rounded-[20px]"
         onError={handleVideoError}
         onLoadedData={handleVideoLoadedData}
         onLoadStart={() => {
@@ -180,31 +183,33 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
         }}
         onCanPlay={() => {
           console.log(`Can play video: ${video.src}`)
-        preload="metadata"
-      >
-        onCanPlay={() => {
-          console.log(`Can play video: ${video.src}`)
           setIsLoading(false)
         }}
+        preload="metadata"
+      >
+        <source src={video.src} type="video/mp4" />
+        Your browser does not support the video tag.
+      </video>
+
       {/* Play/Pause Button */}
       <Button
         size="icon"
         variant="outline"
         className="absolute rounded-full glass-card opacity-0 group-hover:opacity-100 transition-opacity duration-300"
         style={{
-      {/* Play/Pause Button */}
-      <Button
-          transform: 'translate(-50%, -50%)'
-        }}
-        className="absolute rounded-full glass-card opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-        style={{
           top: '50%',
           left: '50%',
           transform: 'translate(-50%, -50%)'
-          <Play className="w-4 h-4" />
+        }}
         onClick={togglePlayPause}
       >
         {isPlaying ? (
+          <Pause className="w-4 h-4" />
+        ) : (
+          <Play className="w-4 h-4" />
+        )}
+      </Button>
+    </div>
   )
 }
 
@@ -215,12 +220,11 @@ function App() {
     src: string,
     alt?: string,
     index?: number
-  const [lightboxOpen, setLightboxOpen] = useState(false)
-  const [lightboxContent, setLightboxContent] = useState<{
-    type: 'image' | 'video',dex] = useState(-1)
-    src: string,rror] = useState(false)
-    alt?: string,
-    index?: numberf<HTMLVideoElement>(null)
+  } | null>(null)
+  const [currentGalleryIndex, setCurrentGalleryIndex] = useState(-1)
+  const [email, setEmail] = useState('')
+  const [heroVideoError, setHeroVideoError] = useState(false)
+  const heroVideoRef = useRef<HTMLVideoElement>(null)
 
   // Gallery videos - all web animation backgrounds
   const galleryVideos = [
