@@ -8,6 +8,15 @@ import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 import { HowItWorks } from '@/components/HowItWorks'
 import heroVideo from '@/assets/video/emoly_intro_trim.mp4'
+import webAngry from '@/assets/video/web_Animation_background_angry.mp4'
+import webAnxious from '@/assets/video/web_Animation_background_anxious.mp4'
+import webCalm from '@/assets/video/web_Animation_background_calm.mp4'
+import webEmpty from '@/assets/video/web_Animation_background_empty.mp4'
+import webExcited from '@/assets/video/web_Animation_background_excited.mp4'
+import webGrateful from '@/assets/video/web_Animation_background_grateful.mp4'
+import webHappy from '@/assets/video/web_Animation_background_happy.mp4'
+import webSad from '@/assets/video/web_Animation_background_sad.mp4'
+import webTired from '@/assets/video/web_Animation_background_tired.mp4'
 
 function App() {
   const [lightboxOpen, setLightboxOpen] = useState(false)
@@ -22,14 +31,17 @@ function App() {
   
   const heroVideoRef = useRef<HTMLVideoElement>(null)
 
-  // Gallery images - using placeholder URLs
-  const galleryImages = [
-    { src: 'https://picsum.photos/400/600?random=1', alt: 'Feelis onboarding' },
-    { src: 'https://picsum.photos/400/600?random=2', alt: 'Breathing exercise' },
-    { src: 'https://picsum.photos/400/600?random=3', alt: 'Emotion journaling' },
-    { src: 'https://picsum.photos/400/600?random=4', alt: 'Daily prompts' },
-    { src: 'https://picsum.photos/400/600?random=5', alt: 'Insights view' },
-    { src: 'https://picsum.photos/400/600?random=6', alt: 'Calming visuals' },
+  // Gallery videos - all web animation backgrounds
+  const galleryVideos = [
+    { src: webAngry, alt: 'Angry emotion background animation' },
+    { src: webAnxious, alt: 'Anxious emotion background animation' },
+    { src: webCalm, alt: 'Calm emotion background animation' },
+    { src: webEmpty, alt: 'Empty emotion background animation' },
+    { src: webExcited, alt: 'Excited emotion background animation' },
+    { src: webGrateful, alt: 'Grateful emotion background animation' },
+    { src: webHappy, alt: 'Happy emotion background animation' },
+    { src: webSad, alt: 'Sad emotion background animation' },
+    { src: webTired, alt: 'Tired emotion background animation' },
   ]
 
   const features = [
@@ -86,14 +98,14 @@ function App() {
     if (currentGalleryIndex === -1) return
     
     const newIndex = direction === 'next' 
-      ? (currentGalleryIndex + 1) % galleryImages.length
-      : (currentGalleryIndex - 1 + galleryImages.length) % galleryImages.length
+      ? (currentGalleryIndex + 1) % galleryVideos.length
+      : (currentGalleryIndex - 1 + galleryVideos.length) % galleryVideos.length
     
-    const newImage = galleryImages[newIndex]
+    const newVideo = galleryVideos[newIndex]
     setLightboxContent({
-      type: 'image',
-      src: newImage.src,
-      alt: newImage.alt,
+      type: 'video',
+      src: newVideo.src,
+      alt: newVideo.alt,
       index: newIndex
     })
     setCurrentGalleryIndex(newIndex)
@@ -302,22 +314,28 @@ function App() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {galleryImages.map((image, index) => (
+            {galleryVideos.map((video, index) => (
               <div 
                 key={index}
-                className="gallery-image cursor-pointer group"
+                className="gallery-video cursor-pointer group"
                 onClick={() => openLightbox({
-                  type: 'image',
-                  src: image.src,
-                  alt: image.alt,
+                  type: 'video',
+                  src: video.src,
+                  alt: video.alt,
                   index
                 })}
               >
-                <img
-                  src={image.src}
-                  alt={image.alt}
-                  loading="lazy"
-                />
+                <video
+                  src={video.src}
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  controls
+                  className="w-full h-64 object-cover"
+                >
+                  Your browser does not support the video tag.
+                </video>
               </div>
             ))}
           </div>
@@ -534,6 +552,9 @@ function App() {
                 src={lightboxContent.src}
                 controls
                 autoPlay
+                muted
+                loop
+                playsInline
                 className="max-w-full max-h-[88vh] rounded-2xl"
               />
             )}
