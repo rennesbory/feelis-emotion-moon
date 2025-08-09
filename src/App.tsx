@@ -121,23 +121,23 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
   const retryVideoLoad = () => {
     setIsLoaded(false)
     setIsLoading(true)
+    setHasError(false)
     const videoElement = videoRef.current
     if (videoElement) {
       videoElement.load()
+    }
   }
 
-  }/ Initialize video on mount
-(() => {
+  // Initialize video on mount
+  useEffect(() => {
+    const videoElement = videoRef.current
+    if (videoElement) {
       // Set the source and try to load
       videoElement.src = video.src
       videoElement.load()
     }
   }, [video.src, isLoaded, hasError])
 
-  if (hasError) {
-    return (
-      <div className="gallery-video cursor-pointer group relative bg-muted rounded-[20px] aspect-[9/16] flex flex-col items-center justify-center p-4">
-        <p className="text-muted-foreground text-sm text-center">Video unavailable</p>
   if (hasError) {
     return (
       <div className="gallery-video cursor-pointer group relative bg-muted rounded-[20px] aspect-[9/16] flex flex-col items-center justify-center p-4">
@@ -151,6 +151,9 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
         >
           Retry
         </button>
+      </div>
+    )
+  }
   if (isLoading) {
     return (
       <div className="gallery-video cursor-pointer group relative bg-muted rounded-[20px] aspect-[9/16] flex flex-col items-center justify-center p-4">
@@ -170,7 +173,7 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
         muted
         loop
         playsInline
-        className="w-full aspect-[9/16] object-cover"
+        className="w-full aspect-[9/16] object-cover rounded-[20px]"
         onError={handleVideoError}
         onLoadedData={handleVideoLoadedData}
         onLoadStart={() => {
@@ -179,51 +182,55 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
         }}
         onCanPlay={() => {
           console.log(`Can play video: ${video.src}`)
-        onCanPlay={() => {
-          console.log(`Can play video: ${video.src}`)
-      {/* Play/Pause Button */}
-      <Button
-        size="icon"
         }}
+      >
+        <source src={video.src} type="video/mp4" />
+        Your browser does not support the video tag.
+      </video>
+      
       {/* Play/Pause Button */}
       <Button
         size="icon"
         variant="outline"
-        className="absolute rounded-full glass-card opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-        style={{
-        className="absolute rounded-full glass-card opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+        className="absolute top-1/2 left-1/2 rounded-full glass-card opacity-0 group-hover:opacity-100 transition-opacity duration-300"
         style={{
           transform: 'translate(-50%, -50%)'
         }}
-          transform: 'translate(-50%, -50%)'
-        style={{
         onClick={togglePlayPause}
       >
         {isPlaying ? (
+          <Pause className="w-4 h-4" />
+        ) : (
           <Play className="w-4 h-4" />
-}
-
-function App() {
+        )}
+      </Button>
+    </div>
   )
 }
 
 function App() {
-    alt?: string,
-    index?: number
+  const [email, setEmail] = useState('')
   const [lightboxOpen, setLightboxOpen] = useState(false)
   const [lightboxContent, setLightboxContent] = useState<{
-    type: 'image' | 'video',dex] = useState(-1)
-    src: string,rror] = useState(false)
+    type: 'image' | 'video',
+    src: string,
+    alt?: string,
+    index?: number
+  } | null>(null)
+  const [currentGalleryIndex, setCurrentGalleryIndex] = useState(-1)
+  const [heroVideoError, setHeroVideoError] = useState(false)
+  const heroVideoRef = useRef<HTMLVideoElement>(null)
+  // Gallery videos - all web animation backgrounds
   const galleryVideos = [
     { src: webAngry, alt: 'Angry emotion background animation' },
     { src: webAnxious, alt: 'Anxious emotion background animation' },
     { src: webCalm, alt: 'Calm emotion background animation' },
-    alt?: string, background animation' },
+    { src: webEmpty, alt: 'Empty emotion background animation' },
     { src: webExcited, alt: 'Excited emotion background animation' },
-
-  // Gallery videos - all web animation backgrounds
-  const galleryVideos = [
-    { src: webAngry, alt: 'Angry emotion background animation' },
+    { src: webGrateful, alt: 'Grateful emotion background animation' },
+    { src: webHappy, alt: 'Happy emotion background animation' },
+    { src: webSad, alt: 'Sad emotion background animation' },
+    { src: webTired, alt: 'Tired emotion background animation' }
   ]
 
   // Add debug logging for gallery videos
