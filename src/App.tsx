@@ -12,43 +12,25 @@ import { HowItWorks } from '@/components/HowItWorks'
 // Import static assets
 import feelisLogo from '@/assets/images/feelis_logo.png'
 
-// Use public folder for videos to ensure deployment compatibility
-const heroVideo = '/videos/emoly_intro_trim.mp4'
-const webAngry = '/videos/web_Animation_background_angry.mp4'
-const webAnxious = '/videos/web_Animation_background_anxious.mp4'
-const webCalm = '/videos/web_Animation_background_calm.mp4'
-const webEmpty = '/videos/web_Animation_background_empty.mp4'
-const webExcited = '/videos/web_Animation_background_excited.mp4'
-const webGrateful = '/videos/web_Animation_background_grateful.mp4'
-const webHappy = '/videos/web_Animation_background_happy.mp4'
-const webSad = '/videos/web_Animation_background_sad.mp4'
-const webTired = '/videos/web_Animation_background_tired.mp4'
+// Import videos directly for reliable path resolution
+import heroVideo from '@/assets/videos/emoly_intro_trim.mp4'
+import webAngry from '@/assets/videos/web_Animation_background_angry.mp4'
+import webAnxious from '@/assets/videos/web_Animation_background_anxious.mp4'
+import webCalm from '@/assets/videos/web_Animation_background_calm.mp4'
+import webEmpty from '@/assets/videos/web_Animation_background_empty.mp4'
+import webExcited from '@/assets/videos/web_Animation_background_excited.mp4'
+import webGrateful from '@/assets/videos/web_Animation_background_grateful.mp4'
+import webHappy from '@/assets/videos/web_Animation_background_happy.mp4'
+import webSad from '@/assets/videos/web_Animation_background_sad.mp4'
+import webTired from '@/assets/videos/web_Animation_background_tired.mp4'
 
-// Debug: Test if we can reach the videos
-console.log('🎬 Video paths configured:')
-console.log('Hero:', heroVideo)
-console.log('Gallery videos configured:', [webAngry, webAnxious, webCalm, webEmpty, webExcited, webGrateful, webHappy, webSad, webTired])
+// Video import verification
+console.log('✅ All videos successfully imported:', {
+  hero: typeof heroVideo === 'string',
+  galleryCount: [webAngry, webAnxious, webCalm, webEmpty, webExcited, webGrateful, webHappy, webSad, webTired].length
+})
 
-// Test video accessibility
-const testVideoAccess = async () => {
-  console.log('🔍 Testing video accessibility...')
-  const testVideos = [heroVideo, webAngry, webAnxious, webCalm]
-  
-  for (const videoSrc of testVideos) {
-    try {
-      const response = await fetch(videoSrc, { method: 'HEAD' })
-      console.log(`${response.ok ? '✅' : '❌'} ${videoSrc}: ${response.status} ${response.statusText}`)
-    } catch (error) {
-      console.log(`❌ ${videoSrc}: Network error -`, error.message)
-    }
-  }
-}
 
-// Run the test after a short delay
-setTimeout(testVideoAccess, 1000)
-
-// Debug logging for video paths
-console.log('=== VIDEO PATH DEBUG ===')
 
 interface GalleryVideoProps {
   video: { src: string; alt: string }
@@ -97,15 +79,15 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
     }
   }
 
-  // Log video loading
-  console.log(`🎬 Gallery video ${index}: ${video.src.split('/').pop()}`)
+  // Log video loading for debugging
+  console.log(`🎬 Loading gallery video ${index}`)
 
   if (hasError) {
     return (
       <div className="gallery-video cursor-pointer group relative bg-muted rounded-[20px] aspect-[9/16] flex flex-col items-center justify-center p-4">
         <p className="text-muted-foreground text-sm text-center mb-2">Video Error</p>
         <p className="text-muted-foreground text-xs text-center opacity-70 mb-3">
-          {video.src.split('/').pop()}
+          Gallery video {index + 1}
         </p>
         <Button
           size="sm"
@@ -137,27 +119,19 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
         preload="metadata"
         className="w-full aspect-[9/16] object-cover rounded-[20px]"
         onError={(e) => {
-          console.error(`🚨 Gallery video ${index} failed to load:`)
-          console.error('Video source:', video.src)
-          console.error('Error event:', e)
-          console.error('Error type:', e.type)
-          console.error('Current src:', videoRef.current?.currentSrc)
-          console.error('Network state:', videoRef.current?.networkState)
-          console.error('Ready state:', videoRef.current?.readyState)
+          console.error(`Gallery video ${index} failed to load:`, e.type)
           setHasError(true)
           setIsLoading(false)
         }}
         onLoadedData={() => {
-          console.log(`✅ Gallery video ${index} loaded successfully:`, video.src)
+          console.log(`✅ Gallery video ${index} loaded successfully`)
           setIsLoading(false)
           setHasError(false)
         }}
         onLoadStart={() => {
-          console.log(`🔄 Gallery video ${index} load start`)
           setIsLoading(true)
         }}
         onCanPlay={() => {
-          console.log(`▶️ Gallery video ${index} can play`)
           setIsLoading(false)
         }}
         onPause={() => setIsPlaying(false)}
@@ -210,7 +184,7 @@ function App() {
     { src: webTired, alt: 'Tired emotion background animation' }
   ]
 
-  console.log('Gallery videos check:', galleryVideos.length, 'videos total')
+
 
   const features = [
     {
@@ -301,7 +275,7 @@ function App() {
     if (!video) return
 
     // Debug logging
-    console.log('🎬 Hero video configured:', heroVideo.split('/').pop())
+    console.log('🎬 Hero video ready')
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -419,7 +393,7 @@ function App() {
                   <div className="w-full aspect-[9/16] bg-muted rounded-[20px] flex flex-col items-center justify-center p-4">
                     <p className="text-muted-foreground text-center mb-2">Video unavailable</p>
                     <p className="text-muted-foreground text-xs text-center opacity-70 mb-3">
-                      {heroVideo.split('/').pop()}
+                      Hero video
                     </p>
                     <button 
                       onClick={() => {
@@ -446,31 +420,19 @@ function App() {
                     loop
                     preload="metadata"
                     onError={(e) => {
-                      console.error('🚨 Hero video failed to load:')
-                      console.error('Video source:', heroVideo)
-                      console.error('Error event:', e)
-                      console.error('Current src:', heroVideoRef.current?.currentSrc)
-                      console.error('Network state:', heroVideoRef.current?.networkState)
-                      console.error('Ready state:', heroVideoRef.current?.readyState)
+                      console.error('Hero video failed to load:', e.type)
                       setHeroVideoError(true)
                     }}
                     onLoadedData={() => {
-                      console.log('✅ Hero video loaded successfully:', heroVideo)
+                      console.log('✅ Hero video loaded successfully')
                       setHeroVideoError(false)
                       // Try to auto-play
                       const video = heroVideoRef.current
                       if (video) {
-                        video.play().catch((error) => {
-                          console.log('Hero video auto-play failed (expected on some browsers):', error)
-                          // Auto-play failed, that's fine
+                        video.play().catch(() => {
+                          // Auto-play failed, that's fine for some browsers
                         })
                       }
-                    }}
-                    onLoadStart={() => {
-                      console.log('🔄 Hero video load start')
-                    }}
-                    onCanPlay={() => {
-                      console.log('▶️ Hero video can play')
                     }}
                   >
                     Your browser does not support the video tag.
