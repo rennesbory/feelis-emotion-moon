@@ -19,6 +19,21 @@ import webHappy from '@/assets/video/web_Animation_background_happy.mp4'
 import webSad from '@/assets/video/web_Animation_background_sad.mp4'
 import webTired from '@/assets/video/web_Animation_background_tired.mp4'
 
+// Debug logging for asset imports
+console.log('Asset imports:', {
+  heroVideo,
+  feelisLogo,
+  webAngry,
+  webAnxious,
+  webCalm,
+  webEmpty,
+  webExcited,
+  webGrateful,
+  webHappy,
+  webSad,
+  webTired
+})
+
 interface GalleryVideoProps {
   video: { src: string; alt: string }
   index: number
@@ -27,6 +42,7 @@ interface GalleryVideoProps {
 
 function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
   const [isPlaying, setIsPlaying] = useState(true)
+  const [hasError, setHasError] = useState(false)
   const videoRef = useRef<HTMLVideoElement>(null)
 
   const togglePlayPause = (e: React.MouseEvent) => {
@@ -52,6 +68,23 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
     })
   }
 
+  const handleVideoError = () => {
+    setHasError(true)
+    console.error(`Failed to load video: ${video.src}`)
+  }
+
+  const handleVideoLoad = () => {
+    setHasError(false)
+  }
+
+  if (hasError) {
+    return (
+      <div className="gallery-video cursor-pointer group relative bg-muted rounded-[20px] aspect-[9/16] flex items-center justify-center">
+        <p className="text-muted-foreground text-sm">Video unavailable</p>
+      </div>
+    )
+  }
+
   return (
     <div className="gallery-video cursor-pointer group relative" onClick={handleVideoClick}>
       <video
@@ -62,6 +95,8 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
         loop
         playsInline
         className="w-full aspect-[9/16] object-cover"
+        onError={handleVideoError}
+        onLoadStart={handleVideoLoad}
       >
         Your browser does not support the video tag.
       </video>
@@ -93,6 +128,7 @@ function App() {
   } | null>(null)
   const [email, setEmail] = useState('')
   const [currentGalleryIndex, setCurrentGalleryIndex] = useState(-1)
+  const [heroVideoError, setHeroVideoError] = useState(false)
   
   const heroVideoRef = useRef<HTMLVideoElement>(null)
 
@@ -199,13 +235,20 @@ function App() {
     const video = heroVideoRef.current
     if (!video) return
 
+    // Debug logging
+    console.log('Hero video source:', heroVideo)
+    console.log('Video element:', video)
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (!entry.isIntersecting) {
             video.pause()
           } else if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-            video.play().catch(() => {})
+            video.play().catch((error) => {
+              console.error('Failed to play hero video:', error)
+              setHeroVideoError(true)
+            })
           }
         })
       },
@@ -214,7 +257,7 @@ function App() {
 
     observer.observe(video)
     return () => observer.disconnect()
-  }, [])
+  }, [heroVideoError])
 
   return (
     <div className="min-h-screen">
@@ -308,18 +351,25 @@ function App() {
 
             <div>
               <div className="hero-video-container">
-                <video
-                  ref={heroVideoRef}
-                  className="w-full"
-                  autoPlay
-                  muted
-                  playsInline
-                  loop
-                  poster="https://picsum.photos/300/600?random=7"
-                >
-                  <source src={heroVideo} type="video/mp4" />
-                  Your browser does not support the video tag.
-                </video>
+                {heroVideoError ? (
+                  <div className="w-full aspect-[9/16] bg-muted rounded-[20px] flex items-center justify-center">
+                    <p className="text-muted-foreground">Video unavailable</p>
+                  </div>
+                ) : (
+                  <video
+                    ref={heroVideoRef}
+                    className="w-full"
+                    autoPlay
+                    muted
+                    playsInline
+                    loop
+                    onError={() => setHeroVideoError(true)}
+                    onLoadStart={() => setHeroVideoError(false)}
+                  >
+                    <source src={heroVideo} type="video/mp4" />
+                    Your browser does not support the video tag.
+                  </video>
+                )}
               </div>
             </div>
           </div>
@@ -389,9 +439,8 @@ function App() {
                 className="w-full rounded-xl"
                 controls
                 playsInline
-                poster="https://picsum.photos/400/600?random=8"
               >
-                <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4" type="video/mp4" />
+                <source src={heroVideo} type="video/mp4" />
                 Your browser does not support the video tag.
               </video>
             </div>
@@ -409,7 +458,7 @@ function App() {
                   size="lg"
                   onClick={() => openLightbox({
                     type: 'video',
-                    src: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4'
+                    src: heroVideo
                   })}
                   className="rounded-xl"
                 >

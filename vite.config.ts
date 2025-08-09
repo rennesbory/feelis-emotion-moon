@@ -22,4 +22,25 @@ export default defineConfig({
       '@': resolve(projectRoot, 'src')
     }
   },
+  assetsInclude: ['**/*.mp4', '**/*.webm', '**/*.ogg', '**/*.mp3', '**/*.wav', '**/*.flac', '**/*.aac'],
+  build: {
+    rollupOptions: {
+      output: {
+        assetFileNames: (assetInfo) => {
+          if (assetInfo.name?.match(/\.(mp4|webm|ogg|mp3|wav|flac|aac)$/)) {
+            return 'assets/video/[name]-[hash][extname]'
+          }
+          if (assetInfo.name?.match(/\.(png|jpg|jpeg|gif|svg|webp|avif)$/)) {
+            return 'assets/images/[name]-[hash][extname]'
+          }
+          return 'assets/[name]-[hash][extname]'
+        }
+      }
+    }
+  },
+  server: {
+    fs: {
+      strict: false
+    }
+  }
 });
