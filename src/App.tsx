@@ -7,6 +7,8 @@ import { Play, X, Download, ArrowRight, ArrowLeft, Pause } from '@phosphor-icons
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 import { HowItWorks } from '@/components/HowItWorks'
+
+// Import assets
 import heroVideo from '@/assets/video/emoly_intro_trim.mp4'
 import feelisLogo from '@/assets/images/feelis_logo.png'
 import webAngry from '@/assets/video/web_Animation_background_angry.mp4'
@@ -20,18 +22,10 @@ import webSad from '@/assets/video/web_Animation_background_sad.mp4'
 import webTired from '@/assets/video/web_Animation_background_tired.mp4'
 
 // Debug logging for asset imports
-console.log('Asset imports:', {
-  heroVideo,
-  feelisLogo,
-  webAngry,
-  webAnxious,
-  webCalm,
-  webEmpty,
-  webExcited,
-  webGrateful,
-  webHappy,
-  webSad,
-  webTired
+console.log('Asset imports check:', {
+  heroVideo: typeof heroVideo === 'string' ? heroVideo : 'Not a string',
+  feelisLogo: typeof feelisLogo === 'string' ? feelisLogo : 'Not a string',
+  webAngry: typeof webAngry === 'string' ? webAngry : 'Not a string'
 })
 
 interface GalleryVideoProps {
@@ -41,8 +35,9 @@ interface GalleryVideoProps {
 }
 
 function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
-  const [isPlaying, setIsPlaying] = useState(true)
+  const [isPlaying, setIsPlaying] = useState(false)
   const [hasError, setHasError] = useState(false)
+  const [isLoaded, setIsLoaded] = useState(false)
   const videoRef = useRef<HTMLVideoElement>(null)
 
   const togglePlayPause = (e: React.MouseEvent) => {
@@ -54,8 +49,12 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
       videoElement.pause()
       setIsPlaying(false)
     } else {
-      videoElement.play().catch(() => {})
-      setIsPlaying(true)
+      videoElement.play()
+        .then(() => setIsPlaying(true))
+        .catch((error) => {
+          console.error('Failed to play video:', error)
+          setHasError(true)
+        })
     }
   }
 
@@ -68,19 +67,38 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
     })
   }
 
-  const handleVideoError = () => {
-    setHasError(true)
+  const handleVideoError = (e: React.SyntheticEvent<HTMLVideoElement>) => {
+    const target = e.target as HTMLVideoElement
     console.error(`Failed to load video: ${video.src}`)
+    console.error('Video error details:', {
+      src: video.src,
+      networkState: target.networkState,
+      readyState: target.readyState,
+      error: target.error
+    })
+    setHasError(true)
   }
 
-  const handleVideoLoad = () => {
+  const handleVideoLoadedData = () => {
     setHasError(false)
+    setIsLoaded(true)
+    // Try to auto-play muted video
+    const videoElement = videoRef.current
+    if (videoElement) {
+      videoElement.play()
+        .then(() => setIsPlaying(true))
+        .catch(() => {
+          // Auto-play failed, that's fine - user can click play
+          setIsPlaying(false)
+        })
+    }
   }
 
   if (hasError) {
     return (
-      <div className="gallery-video cursor-pointer group relative bg-muted rounded-[20px] aspect-[9/16] flex items-center justify-center">
-        <p className="text-muted-foreground text-sm">Video unavailable</p>
+      <div className="gallery-video cursor-pointer group relative bg-muted rounded-[20px] aspect-[9/16] flex flex-col items-center justify-center p-4">
+        <p className="text-muted-foreground text-sm text-center">Video unavailable</p>
+        <p className="text-muted-foreground text-xs mt-1 text-center break-all">{video.src}</p>
       </div>
     )
   }
@@ -89,15 +107,15 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
     <div className="gallery-video cursor-pointer group relative" onClick={handleVideoClick}>
       <video
         ref={videoRef}
-        src={video.src}
-        autoPlay
         muted
         loop
         playsInline
         className="w-full aspect-[9/16] object-cover"
         onError={handleVideoError}
-        onLoadStart={handleVideoLoad}
+        onLoadedData={handleVideoLoadedData}
+        preload="metadata"
       >
+        <source src={video.src} type="video/mp4" />
         Your browser does not support the video tag.
       </video>
       
@@ -144,6 +162,9 @@ function App() {
     { src: webSad, alt: 'Sad emotion background animation' },
     { src: webTired, alt: 'Tired emotion background animation' },
   ]
+
+  // Add debug logging for gallery videos
+  console.log('Gallery videos:', galleryVideos)
 
   const features = [
     {
@@ -352,19 +373,32 @@ function App() {
             <div>
               <div className="hero-video-container">
                 {heroVideoError ? (
-                  <div className="w-full aspect-[9/16] bg-muted rounded-[20px] flex items-center justify-center">
-                    <p className="text-muted-foreground">Video unavailable</p>
+                  <div className="w-full aspect-[9/16] bg-muted rounded-[20px] flex flex-col items-center justify-center p-4">
+                    <p className="text-muted-foreground text-center">Video unavailable</p>
+                    <p className="text-muted-foreground text-xs mt-2 text-center">{heroVideo}</p>
                   </div>
                 ) : (
                   <video
                     ref={heroVideoRef}
                     className="w-full"
-                    autoPlay
                     muted
                     playsInline
                     loop
-                    onError={() => setHeroVideoError(true)}
-                    onLoadStart={() => setHeroVideoError(false)}
+                    preload="metadata"
+                    onError={(e) => {
+                      console.error('Hero video error:', e)
+                      setHeroVideoError(true)
+                    }}
+                    onLoadedData={() => {
+                      setHeroVideoError(false)
+                      // Try to auto-play
+                      const video = heroVideoRef.current
+                      if (video) {
+                        video.play().catch(() => {
+                          // Auto-play failed, that's fine
+                        })
+                      }
+                    }}
                   >
                     <source src={heroVideo} type="video/mp4" />
                     Your browser does not support the video tag.
