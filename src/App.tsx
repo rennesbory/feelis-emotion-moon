@@ -131,20 +131,7 @@ function App() {
     }
   ]
 
-  const testimonials = [
-    {
-      quote: "In 60 seconds I go from spiraling to steady. It's shockingly kind.",
-      author: "Beta user"
-    },
-    {
-      quote: "The visuals make me want to breathe. My favorite ritual before bed.",
-      author: "OTF fan (and now a Feelis fan)"
-    },
-    {
-      quote: "No feeds, no noise. Just a tiny practice that actually sticks.",
-      author: "Designer & mom"
-    }
-  ]
+
 
   const openLightbox = (content: typeof lightboxContent) => {
     setLightboxContent(content)
@@ -439,29 +426,7 @@ function App() {
         </div>
       </section>
 
-      {/* Testimonials Section */}
-      <section className="py-20 px-6">
-        <div className="container mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-bold mb-4">
-              People are feeling it
-            </h2>
-          </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {testimonials.map((testimonial, index) => (
-              <Card key={index} className="glass-card p-6">
-                <blockquote className="text-lg mb-4">
-                  "{testimonial.quote}"
-                </blockquote>
-                <cite className="text-sm font-semibold text-muted-foreground not-italic">
-                  — {testimonial.author}
-                </cite>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* Download Section */}
       <section id="download" className="py-20 px-6">
