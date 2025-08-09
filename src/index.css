@@ -35,7 +35,7 @@
 }
 
 body {
-  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Nunito', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   background: radial-gradient(1200px 800px at 20% -10%, oklch(0.85 0.1 30), transparent 60%),
               radial-gradient(1200px 800px at 110% 10%, oklch(0.8 0.12 250), transparent 50%),
               var(--background);
@@ -191,4 +191,14 @@ body {
 
 .hero-video-container video {
   border-radius: 12px;
+}
+
+/* Add font family overrides for headings and special elements */
+h1, h2, h3, h4, h5, h6, .brand-font {
+  font-family: 'Comfortaa', 'Nunito', system-ui, sans-serif;
+  font-weight: 700;
+}
+
+.body-font {
+  font-family: 'Nunito', system-ui, sans-serif;
 }
