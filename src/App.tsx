@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from 'react'
-import * as React from 'react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -14,8 +13,6 @@ import feelisLogo from '@/assets/images/feelis_logo.png'
 
 // Import video assets properly using Vite import system
 import heroVideo from '@/assets/video/emoly_intro_trim.mp4'
-
-// Import all web animation videos
 import webAngry from '@/assets/video/web_Animation_background_angry.mp4'
 import webAnxious from '@/assets/video/web_Animation_background_anxious.mp4'
 import webCalm from '@/assets/video/web_Animation_background_calm.mp4'
@@ -105,7 +102,6 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
     setIsLoaded(true)
     setIsLoading(false)
     
-    // Try to auto-play muted video after a short delay to ensure it's fully loaded
     setTimeout(() => {
       const videoElement = videoRef.current
       if (videoElement && videoElement.readyState >= 3) {
@@ -113,7 +109,7 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
           .then(() => {
             console.log(`Auto-play started for: ${video.src}`)
             setIsPlaying(true)
-          })
+            setIsPlaying(true)
           .catch((error) => {
             console.log(`Auto-play failed for: ${video.src}`, error)
             setIsPlaying(false)
@@ -121,53 +117,34 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
       }
     }, 100)
   }
+  }
 
   const retryVideoLoad = () => {
-    console.log(`Retrying video load for: ${video.src}`)
-    setHasError(false)
     setIsLoaded(false)
     setIsLoading(true)
     const videoElement = videoRef.current
     if (videoElement) {
       videoElement.load()
-    }
   }
 
-  // Initialize video on mount with better error handling
-  React.useEffect(() => {
-    const videoElement = videoRef.current
-    if (videoElement && !isLoaded && !hasError) {
-      // Verify the video source is valid
-      if (!video.src || typeof video.src !== 'string') {
-        console.error('Invalid video source:', video.src)
-        setHasError(true)
-        setIsLoading(false)
-        return
-      }
-      
-      console.log(`Initializing video: ${video.src}`)
-      // Don't set src directly, let the video element handle it via the source tag
+  }/ Initialize video on mount
+(() => {
+      // Set the source and try to load
+      videoElement.src = video.src
       videoElement.load()
-      
-      // Add a timeout to catch cases where the video never loads
-      const loadTimeout = setTimeout(() => {
-        if (isLoading && !isLoaded && !hasError) {
-          console.error(`Video load timeout for: ${video.src}`)
-          setHasError(true)
-          setIsLoading(false)
-        }
-      }, 10000) // 10 second timeout
-      
-      return () => clearTimeout(loadTimeout)
     }
-  }, [video.src, isLoaded, hasError, isLoading])
+  }, [video.src, isLoaded, hasError])
 
   if (hasError) {
     return (
       <div className="gallery-video cursor-pointer group relative bg-muted rounded-[20px] aspect-[9/16] flex flex-col items-center justify-center p-4">
         <p className="text-muted-foreground text-sm text-center">Video unavailable</p>
+  if (hasError) {
+    return (
+      <div className="gallery-video cursor-pointer group relative bg-muted rounded-[20px] aspect-[9/16] flex flex-col items-center justify-center p-4">
+        <p className="text-muted-foreground text-sm text-center">Video unavailable</p>
         <p className="text-muted-foreground text-xs mt-1 text-center opacity-70">
-          {video.src ? video.src.split('/').pop() : 'Unknown video'}
+          {video.src.split('/').pop()}
         </p>
         <button 
           onClick={retryVideoLoad}
@@ -175,17 +152,13 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
         >
           Retry
         </button>
-      </div>
-    )
-  }
-
   if (isLoading) {
     return (
       <div className="gallery-video cursor-pointer group relative bg-muted rounded-[20px] aspect-[9/16] flex flex-col items-center justify-center p-4">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
         <p className="text-muted-foreground text-sm text-center mt-2">Loading video...</p>
         <p className="text-muted-foreground text-xs mt-1 text-center opacity-70">
-          {video.src ? video.src.split('/').pop() : 'Unknown video'}
+          {video.src.split('/').pop()}
         </p>
       </div>
     )
@@ -207,42 +180,31 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
         }}
         onCanPlay={() => {
           console.log(`Can play video: ${video.src}`)
-          setIsLoading(false)
-        }}
-        onWaiting={() => {
-          console.log(`Video waiting: ${video.src}`)
-        }}
-        onStalled={() => {
-          console.log(`Video stalled: ${video.src}`)
-        }}
-        onSuspend={() => {
-          console.log(`Video suspended: ${video.src}`)
-        }}
         preload="metadata"
       >
-        <source src={video.src} type="video/mp4" />
-        Your browser does not support the video tag.
-      </video>
-      
+        onCanPlay={() => {
+          console.log(`Can play video: ${video.src}`)
+          setIsLoading(false)
+        }}
       {/* Play/Pause Button */}
       <Button
         size="icon"
         variant="outline"
         className="absolute rounded-full glass-card opacity-0 group-hover:opacity-100 transition-opacity duration-300"
         style={{
+      {/* Play/Pause Button */}
+      <Button
+          transform: 'translate(-50%, -50%)'
+        }}
+        className="absolute rounded-full glass-card opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+        style={{
           top: '50%',
           left: '50%',
           transform: 'translate(-50%, -50%)'
-        }}
+          <Play className="w-4 h-4" />
         onClick={togglePlayPause}
       >
         {isPlaying ? (
-          <Pause className="w-4 h-4" />
-        ) : (
-          <Play className="w-4 h-4" />
-        )}
-      </Button>
-    </div>
   )
 }
 
@@ -253,12 +215,12 @@ function App() {
     src: string,
     alt?: string,
     index?: number
-  } | null>(null)
-  const [email, setEmail] = useState('')
-  const [currentGalleryIndex, setCurrentGalleryIndex] = useState(-1)
-  const [heroVideoError, setHeroVideoError] = useState(false)
-  
-  const heroVideoRef = useRef<HTMLVideoElement>(null)
+  const [lightboxOpen, setLightboxOpen] = useState(false)
+  const [lightboxContent, setLightboxContent] = useState<{
+    type: 'image' | 'video',dex] = useState(-1)
+    src: string,rror] = useState(false)
+    alt?: string,
+    index?: numberf<HTMLVideoElement>(null)
 
   // Gallery videos - all web animation backgrounds
   const galleryVideos = [
@@ -275,17 +237,6 @@ function App() {
 
   // Add debug logging for gallery videos
   console.log('Gallery videos:', galleryVideos)
-  console.log('Individual video sources check:', {
-    webAngry: typeof webAngry === 'string' ? 'OK' : 'FAIL',
-    webAnxious: typeof webAnxious === 'string' ? 'OK' : 'FAIL', 
-    webCalm: typeof webCalm === 'string' ? 'OK' : 'FAIL',
-    webEmpty: typeof webEmpty === 'string' ? 'OK' : 'FAIL',
-    webExcited: typeof webExcited === 'string' ? 'OK' : 'FAIL',
-    webGrateful: typeof webGrateful === 'string' ? 'OK' : 'FAIL',
-    webHappy: typeof webHappy === 'string' ? 'OK' : 'FAIL',
-    webSad: typeof webSad === 'string' ? 'OK' : 'FAIL',
-    webTired: typeof webTired === 'string' ? 'OK' : 'FAIL',
-  })
 
   const features = [
     {
