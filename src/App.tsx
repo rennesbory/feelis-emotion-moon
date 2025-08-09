@@ -11,24 +11,26 @@ import { HowItWorks } from '@/components/HowItWorks'
 // Import image assets properly using Vite import system
 import feelisLogo from '@/assets/images/feelis_logo.png'
 
-// Import video assets properly using Vite import system
-import heroVideo from '@/assets/video/emoly_intro_trim.mp4'
-import webAngry from '@/assets/video/web_Animation_background_angry.mp4'
-import webAnxious from '@/assets/video/web_Animation_background_anxious.mp4'
-import webCalm from '@/assets/video/web_Animation_background_calm.mp4'
-import webEmpty from '@/assets/video/web_Animation_background_empty.mp4'
-import webExcited from '@/assets/video/web_Animation_background_excited.mp4'
-import webGrateful from '@/assets/video/web_Animation_background_grateful.mp4'
-import webHappy from '@/assets/video/web_Animation_background_happy.mp4'
-import webSad from '@/assets/video/web_Animation_background_sad.mp4'
-import webTired from '@/assets/video/web_Animation_background_tired.mp4'
+// Import image assets properly using Vite import system
+import feelisLogo from '@/assets/images/feelis_logo.png'
 
-// Debug logging for asset paths
-console.log('Asset paths check:', {
+// Use video assets from public folder for better compatibility
+const heroVideo = '/videos/emoly_intro_trim.mp4'
+const webAngry = '/videos/web_Animation_background_angry.mp4'
+const webAnxious = '/videos/web_Animation_background_anxious.mp4'
+const webCalm = '/videos/web_Animation_background_calm.mp4'
+const webEmpty = '/videos/web_Animation_background_empty.mp4'
+const webExcited = '/videos/web_Animation_background_excited.mp4'
+const webGrateful = '/videos/web_Animation_background_grateful.mp4'
+const webHappy = '/videos/web_Animation_background_happy.mp4'
+const webSad = '/videos/web_Animation_background_sad.mp4'
+const webTired = '/videos/web_Animation_background_tired.mp4'
+
+// Debug logging for video paths
+console.log('Video paths configured:', {
   heroVideo,
-  feelisLogo,
-  webAngry,
-  'All assets imported successfully': true
+  totalGalleryVideos: 9,
+  sampleVideoPath: webAngry
 })
 
 interface GalleryVideoProps {
@@ -74,40 +76,15 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
   const handleVideoError = (e: React.SyntheticEvent<HTMLVideoElement>) => {
     const target = e.target as HTMLVideoElement
     console.error(`Failed to load video: ${video.src}`)
-    console.error('Video error details:', {
-      src: video.src,
-      actualSrc: target.src,
-      currentSrc: target.currentSrc,
-      networkState: target.networkState,
-      readyState: target.readyState,
-      error: target.error?.code,
-      errorMessage: target.error?.message
-    })
-    
-    // Try to provide more specific error information
-    let errorReason = 'Unknown error'
+    console.error('Network state:', target.networkState, 'Ready state:', target.readyState)
     if (target.error) {
-      switch (target.error.code) {
-        case MediaError.MEDIA_ERR_ABORTED:
-          errorReason = 'Video load aborted'
-          break
-        case MediaError.MEDIA_ERR_NETWORK:
-          errorReason = 'Network error'
-          break
-        case MediaError.MEDIA_ERR_DECODE:
-          errorReason = 'Video decode error'
-          break
-        case MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED:
-          errorReason = 'Video format not supported'
-          break
-      }
+      console.error('Error code:', target.error.code, 'Message:', target.error.message)
     }
-    console.error('Error reason:', errorReason)
     setHasError(true)
   }
 
   const handleVideoLoadedData = () => {
-    console.log(`Video loaded successfully: ${video.src}`)
+    console.log(`✅ Video loaded: ${video.src.split('/').pop()}`)
     setHasError(false)
     setIsLoaded(true)
     setIsLoading(false)
@@ -116,11 +93,10 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
     if (videoElement) {
       videoElement.play()
         .then(() => {
-          console.log(`Auto-play started for: ${video.src}`)
           setIsPlaying(true)
         })
         .catch((error) => {
-          console.log(`Auto-play failed for: ${video.src}`, error)
+          console.log(`Auto-play failed for: ${video.src.split('/').pop()}`, error.message)
           // Auto-play failed, that's fine - user can click play
           setIsPlaying(false)
         })
@@ -178,14 +154,11 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
         onError={handleVideoError}
         onLoadedData={handleVideoLoadedData}
         onLoadStart={() => {
-          console.log(`Loading video: ${video.src}`)
-          console.log('Actual video element src:', videoRef.current?.src)
-          console.log('Video element currentSrc:', videoRef.current?.currentSrc)
           setIsLoading(true)
         }}
-        onCanPlay={() => console.log(`Can play video: ${video.src}`)}
-        onCanPlayThrough={() => console.log(`Can play through video: ${video.src}`)}
-        onProgress={() => console.log(`Loading progress for: ${video.src}`)}
+        onCanPlay={() => console.log(`✅ Can play: ${video.src.split('/').pop()}`)}
+        onCanPlayThrough={() => console.log(`✅ Can play through: ${video.src.split('/').pop()}`)}
+        onProgress={() => {}} // Silent progress tracking
         preload="metadata"
       >
         <source src={video.src} type="video/mp4" />
@@ -223,7 +196,7 @@ function App() {
   
   const heroVideoRef = useRef<HTMLVideoElement>(null)
 
-  // Gallery videos - all web animation backgrounds
+  // Gallery videos - all web animation backgrounds - using public folder paths
   const galleryVideos = [
     { src: webAngry, alt: 'Angry emotion background animation' },
     { src: webAnxious, alt: 'Anxious emotion background animation' },
@@ -235,9 +208,6 @@ function App() {
     { src: webSad, alt: 'Sad emotion background animation' },
     { src: webTired, alt: 'Tired emotion background animation' },
   ]
-
-  // Add debug logging for gallery videos
-  console.log('Gallery videos:', galleryVideos)
 
   const features = [
     {
@@ -330,8 +300,7 @@ function App() {
     if (!video) return
 
     // Debug logging
-    console.log('Hero video source:', heroVideo)
-    console.log('Video element:', video)
+    console.log('Hero video path:', heroVideo)
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -474,28 +443,26 @@ function App() {
                     loop
                     preload="metadata"
                     onError={(e) => {
-                      console.error('Hero video error:', e)
-                      console.error('Hero video src:', heroVideo)
-                      console.error('Hero video element src:', heroVideoRef.current?.src)
+                      console.error('❌ Hero video error:', heroVideo)
                       setHeroVideoError(true)
                     }}
                     onLoadedData={() => {
-                      console.log('Hero video loaded successfully')
+                      console.log('✅ Hero video loaded successfully')
                       setHeroVideoError(false)
                       // Try to auto-play
                       const video = heroVideoRef.current
                       if (video) {
                         video.play().catch((error) => {
-                          console.log('Hero video auto-play failed:', error)
+                          console.log('Hero video auto-play failed:', error.message)
                           // Auto-play failed, that's fine
                         })
                       }
                     }}
                     onLoadStart={() => {
-                      console.log('Hero video load start:', heroVideo)
+                      console.log('Loading hero video...')
                     }}
                     onCanPlay={() => {
-                      console.log('Hero video can play')
+                      console.log('✅ Hero video can play')
                     }}
                   >
                     <source src={heroVideo} type="video/mp4" />
