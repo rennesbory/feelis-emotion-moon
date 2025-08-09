@@ -8,24 +8,24 @@ import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 import { HowItWorks } from '@/components/HowItWorks'
 
-// Import assets
-import heroVideo from '@/assets/video/emoly_intro_trim.mp4'
-import feelisLogo from '@/assets/images/feelis_logo.png'
-import webAngry from '@/assets/video/web_Animation_background_angry.mp4'
-import webAnxious from '@/assets/video/web_Animation_background_anxious.mp4'
-import webCalm from '@/assets/video/web_Animation_background_calm.mp4'
-import webEmpty from '@/assets/video/web_Animation_background_empty.mp4'
-import webExcited from '@/assets/video/web_Animation_background_excited.mp4'
-import webGrateful from '@/assets/video/web_Animation_background_grateful.mp4'
-import webHappy from '@/assets/video/web_Animation_background_happy.mp4'
-import webSad from '@/assets/video/web_Animation_background_sad.mp4'
-import webTired from '@/assets/video/web_Animation_background_tired.mp4'
+// Import assets - using direct paths as imports may not be working
+const heroVideo = '/src/assets/video/emoly_intro_trim.mp4'
+const feelisLogo = '/src/assets/images/feelis_logo.png'
+const webAngry = '/src/assets/video/web_Animation_background_angry.mp4'
+const webAnxious = '/src/assets/video/web_Animation_background_anxious.mp4'
+const webCalm = '/src/assets/video/web_Animation_background_calm.mp4'
+const webEmpty = '/src/assets/video/web_Animation_background_empty.mp4'
+const webExcited = '/src/assets/video/web_Animation_background_excited.mp4'
+const webGrateful = '/src/assets/video/web_Animation_background_grateful.mp4'
+const webHappy = '/src/assets/video/web_Animation_background_happy.mp4'
+const webSad = '/src/assets/video/web_Animation_background_sad.mp4'
+const webTired = '/src/assets/video/web_Animation_background_tired.mp4'
 
-// Debug logging for asset imports
-console.log('Asset imports check:', {
-  heroVideo: typeof heroVideo === 'string' ? heroVideo : 'Not a string',
-  feelisLogo: typeof feelisLogo === 'string' ? feelisLogo : 'Not a string',
-  webAngry: typeof webAngry === 'string' ? webAngry : 'Not a string'
+// Debug logging for asset paths
+console.log('Asset paths check:', {
+  heroVideo,
+  feelisLogo,
+  webAngry
 })
 
 interface GalleryVideoProps {
@@ -74,8 +74,29 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
       src: video.src,
       networkState: target.networkState,
       readyState: target.readyState,
-      error: target.error
+      error: target.error?.code,
+      errorMessage: target.error?.message
     })
+    
+    // Try to provide more specific error information
+    let errorReason = 'Unknown error'
+    if (target.error) {
+      switch (target.error.code) {
+        case MediaError.MEDIA_ERR_ABORTED:
+          errorReason = 'Video load aborted'
+          break
+        case MediaError.MEDIA_ERR_NETWORK:
+          errorReason = 'Network error'
+          break
+        case MediaError.MEDIA_ERR_DECODE:
+          errorReason = 'Video decode error'
+          break
+        case MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED:
+          errorReason = 'Video format not supported'
+          break
+      }
+    }
+    console.error('Error reason:', errorReason)
     setHasError(true)
   }
 
@@ -113,7 +134,10 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
         className="w-full aspect-[9/16] object-cover"
         onError={handleVideoError}
         onLoadedData={handleVideoLoadedData}
+        onLoadStart={() => console.log(`Loading video: ${video.src}`)}
+        onCanPlay={() => console.log(`Can play video: ${video.src}`)}
         preload="metadata"
+        crossOrigin="anonymous"
       >
         <source src={video.src} type="video/mp4" />
         Your browser does not support the video tag.
