@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { Play, X, Download, ArrowRight, ArrowLeft, Pause } from '@phosphor-icons/react'
 import { cn } from '@/lib/utils'
-import { toast } from 'sonner'
+import { toast, Toaster } from 'sonner'
 import { HowItWorks } from '@/components/HowItWorks'
 
 
@@ -326,6 +326,7 @@ function App() {
 
   return (
     <div className="min-h-screen">
+      <Toaster richColors position="top-right" />
       {/* Header */}
       <header className="sticky top-0 z-50 glass-card border-b">
         <div className="container mx-auto px-6">
