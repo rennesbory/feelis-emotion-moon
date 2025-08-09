@@ -9,25 +9,23 @@ import { toast } from 'sonner'
 import { HowItWorks } from '@/components/HowItWorks'
 
 
-// Import image assets using Vite import system (small files)
+// Import all assets using Vite import system for consistent handling
 import feelisLogo from '@/assets/images/feelis_logo.png'
-
-// Use public folder paths for video assets (large files, better for web deployment)
-const heroVideo = '/videos/emoly_intro_trim.mp4'
-const webAngry = '/videos/web_Animation_background_angry.mp4'
-const webAnxious = '/videos/web_Animation_background_anxious.mp4'
-const webCalm = '/videos/web_Animation_background_calm.mp4'
-const webEmpty = '/videos/web_Animation_background_empty.mp4'
-const webExcited = '/videos/web_Animation_background_excited.mp4'
-const webGrateful = '/videos/web_Animation_background_grateful.mp4'
-const webHappy = '/videos/web_Animation_background_happy.mp4'
-const webSad = '/videos/web_Animation_background_sad.mp4'
-const webTired = '/videos/web_Animation_background_tired.mp4'
+import heroVideo from '@/assets/video/emoly_intro_trim.mp4'
+import webAngry from '@/assets/video/web_Animation_background_angry.mp4'
+import webAnxious from '@/assets/video/web_Animation_background_anxious.mp4'
+import webCalm from '@/assets/video/web_Animation_background_calm.mp4'
+import webEmpty from '@/assets/video/web_Animation_background_empty.mp4'
+import webExcited from '@/assets/video/web_Animation_background_excited.mp4'
+import webGrateful from '@/assets/video/web_Animation_background_grateful.mp4'
+import webHappy from '@/assets/video/web_Animation_background_happy.mp4'
+import webSad from '@/assets/video/web_Animation_background_sad.mp4'
+import webTired from '@/assets/video/web_Animation_background_tired.mp4'
 
 // Debug logging for asset paths
-console.log('Asset paths check:', {
-  heroVideo,
-  feelisLogo,
+console.log('=== ASSET IMPORT DEBUG ===')
+console.log('Hero video:', heroVideo)
+console.log('Gallery videos:', {
   webAngry,
   webAnxious,
   webCalm,
@@ -36,9 +34,14 @@ console.log('Asset paths check:', {
   webGrateful,
   webHappy,
   webSad,
-  webTired,
-  'Using public folder for videos': true
+  webTired
 })
+
+// Verify assets are proper URLs
+const allVideos = [heroVideo, webAngry, webAnxious, webCalm, webEmpty, webExcited, webGrateful, webHappy, webSad, webTired]
+console.log('All videos are strings:', allVideos.every(v => typeof v === 'string'))
+console.log('All videos start with blob: or /:', allVideos.every(v => v.startsWith('/') || v.startsWith('blob:')))
+console.log('=== END DEBUG ==='))
 
 interface GalleryVideoProps {
   video: { src: string; alt: string }
@@ -78,6 +81,7 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
 
   const handleRetry = (e: React.MouseEvent) => {
     e.stopPropagation()
+    console.log('Retrying video:', video.src)
     setHasError(false)
     setIsLoading(true)
     const videoElement = videoRef.current
@@ -86,10 +90,13 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
     }
   }
 
+  // Log video loading
+  console.log(`Gallery video ${index}: loading ${video.src}`)
+
   if (hasError) {
     return (
       <div className="gallery-video cursor-pointer group relative bg-muted rounded-[20px] aspect-[9/16] flex flex-col items-center justify-center p-4">
-        <p className="text-muted-foreground text-sm text-center mb-2">Video unavailable</p>
+        <p className="text-muted-foreground text-sm text-center mb-2">Video Error</p>
         <p className="text-muted-foreground text-xs text-center opacity-70 mb-3">
           {video.src.split('/').pop()}
         </p>
@@ -108,8 +115,8 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
   return (
     <div className="gallery-video cursor-pointer group relative" onClick={handleVideoClick}>
       {isLoading && (
-        <div className="absolute inset-0 bg-muted rounded-[20px] flex items-center justify-center">
-          <p className="text-muted-foreground text-sm">Loading video...</p>
+        <div className="absolute inset-0 bg-muted rounded-[20px] flex items-center justify-center z-10">
+          <p className="text-muted-foreground text-sm">Loading...</p>
         </div>
       )}
       
@@ -123,20 +130,21 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
         preload="metadata"
         className="w-full aspect-[9/16] object-cover rounded-[20px]"
         onError={(e) => {
-          console.error('Gallery video error:', e, 'Source:', video.src)
+          console.error(`Gallery video ${index} error:`, e, 'Source:', video.src)
           setHasError(true)
           setIsLoading(false)
         }}
         onLoadedData={() => {
-          console.log('Gallery video loaded:', video.src)
+          console.log(`Gallery video ${index} loaded:`, video.src)
           setIsLoading(false)
           setHasError(false)
         }}
         onLoadStart={() => {
-          console.log('Gallery video load start:', video.src)
+          console.log(`Gallery video ${index} load start:`, video.src)
           setIsLoading(true)
         }}
         onCanPlay={() => {
+          console.log(`Gallery video ${index} can play`)
           setIsLoading(false)
         }}
         onPause={() => setIsPlaying(false)}
