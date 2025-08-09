@@ -143,3 +143,15 @@ body {
   border-radius: 12px;
   display: block;
 }
+
+/* Hero video styling with rounded corners and white background */
+.hero-video-container {
+  background: white;
+  padding: 8px;
+  border-radius: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.hero-video-container video {
+  border-radius: 12px;
+}

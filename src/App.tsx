@@ -241,10 +241,10 @@ function App() {
             </div>
 
             <div>
-              <div className="device-frame rounded-3xl p-3 shadow-2xl">
+              <div className="hero-video-container">
                 <video
                   ref={heroVideoRef}
-                  className="w-full rounded-xl"
+                  className="w-full"
                   autoPlay
                   muted
                   playsInline
