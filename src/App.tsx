@@ -9,18 +9,20 @@ import { toast } from 'sonner'
 import { HowItWorks } from '@/components/HowItWorks'
 
 
-// Import image and video assets properly using Vite import system
+// Import image assets using Vite import system (small files)
 import feelisLogo from '@/assets/images/feelis_logo.png'
-import heroVideo from '@/assets/video/emoly_intro_trim.mp4'
-import webAngry from '@/assets/video/web_Animation_background_angry.mp4'
-import webAnxious from '@/assets/video/web_Animation_background_anxious.mp4'
-import webCalm from '@/assets/video/web_Animation_background_calm.mp4'
-import webEmpty from '@/assets/video/web_Animation_background_empty.mp4'
-import webExcited from '@/assets/video/web_Animation_background_excited.mp4'
-import webGrateful from '@/assets/video/web_Animation_background_grateful.mp4'
-import webHappy from '@/assets/video/web_Animation_background_happy.mp4'
-import webSad from '@/assets/video/web_Animation_background_sad.mp4'
-import webTired from '@/assets/video/web_Animation_background_tired.mp4'
+
+// Use public folder paths for video assets (large files, better for web deployment)
+const heroVideo = '/videos/emoly_intro_trim.mp4'
+const webAngry = '/videos/web_Animation_background_angry.mp4'
+const webAnxious = '/videos/web_Animation_background_anxious.mp4'
+const webCalm = '/videos/web_Animation_background_calm.mp4'
+const webEmpty = '/videos/web_Animation_background_empty.mp4'
+const webExcited = '/videos/web_Animation_background_excited.mp4'
+const webGrateful = '/videos/web_Animation_background_grateful.mp4'
+const webHappy = '/videos/web_Animation_background_happy.mp4'
+const webSad = '/videos/web_Animation_background_sad.mp4'
+const webTired = '/videos/web_Animation_background_tired.mp4'
 
 // Debug logging for asset paths
 console.log('Asset paths check:', {
@@ -35,7 +37,7 @@ console.log('Asset paths check:', {
   webHappy,
   webSad,
   webTired,
-  'Using imported asset paths': true
+  'Using public folder for videos': true
 })
 
 interface GalleryVideoProps {
@@ -47,21 +49,25 @@ interface GalleryVideoProps {
 function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
   const [isPlaying, setIsPlaying] = useState(false)
   const [hasError, setHasError] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
   const videoRef = useRef<HTMLVideoElement>(null)
 
   const togglePlayPause = (e: React.MouseEvent) => {
     e.stopPropagation()
     const videoElement = videoRef.current
-    if (!videoElement) return
+    if (!videoElement || hasError) return
 
     if (isPlaying) {
       videoElement.pause()
     } else {
-      videoElement.play().catch(() => {})
+      videoElement.play().catch((error) => {
+        console.warn('Gallery video play failed:', error)
+      })
     }
   }
 
   const handleVideoClick = () => {
+    if (hasError) return
     onVideoClick({
       type: 'video',
       src: video.src,
@@ -70,19 +76,43 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
     })
   }
 
+  const handleRetry = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setHasError(false)
+    setIsLoading(true)
+    const videoElement = videoRef.current
+    if (videoElement) {
+      videoElement.load()
+    }
+  }
+
   if (hasError) {
     return (
       <div className="gallery-video cursor-pointer group relative bg-muted rounded-[20px] aspect-[9/16] flex flex-col items-center justify-center p-4">
-        <p className="text-muted-foreground text-sm text-center">Video unavailable</p>
-        <p className="text-muted-foreground text-xs mt-1 text-center opacity-70">
+        <p className="text-muted-foreground text-sm text-center mb-2">Video unavailable</p>
+        <p className="text-muted-foreground text-xs text-center opacity-70 mb-3">
           {video.src.split('/').pop()}
         </p>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={handleRetry}
+          className="text-xs"
+        >
+          Retry
+        </Button>
       </div>
     )
   }
 
   return (
     <div className="gallery-video cursor-pointer group relative" onClick={handleVideoClick}>
+      {isLoading && (
+        <div className="absolute inset-0 bg-muted rounded-[20px] flex items-center justify-center">
+          <p className="text-muted-foreground text-sm">Loading video...</p>
+        </div>
+      )}
+      
       <video
         ref={videoRef}
         src={video.src}
@@ -90,8 +120,25 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
         loop
         playsInline
         autoPlay
+        preload="metadata"
         className="w-full aspect-[9/16] object-cover rounded-[20px]"
-        onError={() => setHasError(true)}
+        onError={(e) => {
+          console.error('Gallery video error:', e, 'Source:', video.src)
+          setHasError(true)
+          setIsLoading(false)
+        }}
+        onLoadedData={() => {
+          console.log('Gallery video loaded:', video.src)
+          setIsLoading(false)
+          setHasError(false)
+        }}
+        onLoadStart={() => {
+          console.log('Gallery video load start:', video.src)
+          setIsLoading(true)
+        }}
+        onCanPlay={() => {
+          setIsLoading(false)
+        }}
         onPause={() => setIsPlaying(false)}
         onPlay={() => setIsPlaying(true)}
       >
@@ -99,18 +146,20 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
       </video>
 
       {/* Play/Pause Button */}
-      <Button
-        className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 glass-card"
-        size="icon"
-        variant="outline"
-        onClick={togglePlayPause}
-      >
-        {isPlaying ? (
-          <Pause className="w-4 h-4" />
-        ) : (
-          <Play className="w-4 h-4" />
-        )}
-      </Button>
+      {!isLoading && !hasError && (
+        <Button
+          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 glass-card"
+          size="icon"
+          variant="outline"
+          onClick={togglePlayPause}
+        >
+          {isPlaying ? (
+            <Pause className="w-4 h-4" />
+          ) : (
+            <Play className="w-4 h-4" />
+          )}
+        </Button>
+      )}
     </div>
   )
 }
@@ -139,6 +188,40 @@ function App() {
     { src: webSad, alt: 'Sad emotion background animation' },
     { src: webTired, alt: 'Tired emotion background animation' }
   ]
+
+  console.log('Gallery videos check:', galleryVideos.map(v => ({
+    src: v.src,
+    filename: v.src.split('/').pop(),
+    accessible: 'checking...'
+  })))
+
+  // Test video accessibility
+  const testVideoAccess = async () => {
+    const results = []
+    for (const video of galleryVideos) {
+      try {
+        const response = await fetch(video.src, { method: 'HEAD' })
+        results.push({
+          src: video.src,
+          accessible: response.ok,
+          status: response.status
+        })
+      } catch (error) {
+        results.push({
+          src: video.src,
+          accessible: false,
+          error: error.message
+        })
+      }
+    }
+    console.log('Video accessibility test results:', results)
+    return results
+  }
+
+  // Run accessibility test
+  useEffect(() => {
+    testVideoAccess()
+  }, [])
 
   console.log('Gallery videos:', galleryVideos)
 
@@ -348,12 +431,13 @@ function App() {
               <div className="hero-video-container">
                 {heroVideoError ? (
                   <div className="w-full aspect-[9/16] bg-muted rounded-[20px] flex flex-col items-center justify-center p-4">
-                    <p className="text-muted-foreground text-center">Video unavailable</p>
-                    <p className="text-muted-foreground text-xs mt-2 text-center opacity-70">
+                    <p className="text-muted-foreground text-center mb-2">Video unavailable</p>
+                    <p className="text-muted-foreground text-xs text-center opacity-70 mb-3">
                       {heroVideo.split('/').pop()}
                     </p>
                     <button 
                       onClick={() => {
+                        console.log('Retrying hero video load...')
                         setHeroVideoError(false)
                         // Try to reload the video
                         const video = heroVideoRef.current
@@ -361,7 +445,7 @@ function App() {
                           video.load()
                         }
                       }}
-                      className="mt-3 px-4 py-2 text-sm bg-muted-foreground/20 rounded-full hover:bg-muted-foreground/30 transition-colors"
+                      className="px-4 py-2 text-sm bg-primary text-primary-foreground rounded-xl hover:bg-primary/90 transition-colors"
                     >
                       Retry
                     </button>
@@ -378,17 +462,19 @@ function App() {
                     onError={(e) => {
                       console.error('Hero video error:', e)
                       console.error('Hero video src:', heroVideo)
-                      console.error('Hero video element src:', heroVideoRef.current?.src)
+                      console.error('Video element src:', heroVideoRef.current?.src)
+                      console.error('Video element readyState:', heroVideoRef.current?.readyState)
+                      console.error('Video element networkState:', heroVideoRef.current?.networkState)
                       setHeroVideoError(true)
                     }}
                     onLoadedData={() => {
-                      console.log('Hero video loaded successfully')
+                      console.log('Hero video loaded successfully:', heroVideo)
                       setHeroVideoError(false)
                       // Try to auto-play
                       const video = heroVideoRef.current
                       if (video) {
                         video.play().catch((error) => {
-                          console.log('Hero video auto-play failed:', error)
+                          console.log('Hero video auto-play failed (expected on some browsers):', error)
                           // Auto-play failed, that's fine
                         })
                       }
