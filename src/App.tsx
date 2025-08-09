@@ -9,20 +9,18 @@ import { toast } from 'sonner'
 import { HowItWorks } from '@/components/HowItWorks'
 
 
-// Import image assets properly using Vite import system
+// Import image and video assets properly using Vite import system
 import feelisLogo from '@/assets/images/feelis_logo.png'
-
-// For videos, let's try using public folder paths to see if that resolves the issue
-const heroVideo = '/videos/emoly_intro_trim.mp4'
-const webAngry = '/videos/web_Animation_background_angry.mp4'
-const webAnxious = '/videos/web_Animation_background_anxious.mp4'
-const webCalm = '/videos/web_Animation_background_calm.mp4'
-const webEmpty = '/videos/web_Animation_background_empty.mp4'
-const webExcited = '/videos/web_Animation_background_excited.mp4'
-const webGrateful = '/videos/web_Animation_background_grateful.mp4'
-const webHappy = '/videos/web_Animation_background_happy.mp4'
-const webSad = '/videos/web_Animation_background_sad.mp4'
-const webTired = '/videos/web_Animation_background_tired.mp4'
+import heroVideo from '@/assets/video/emoly_intro_trim.mp4'
+import webAngry from '@/assets/video/web_Animation_background_angry.mp4'
+import webAnxious from '@/assets/video/web_Animation_background_anxious.mp4'
+import webCalm from '@/assets/video/web_Animation_background_calm.mp4'
+import webEmpty from '@/assets/video/web_Animation_background_empty.mp4'
+import webExcited from '@/assets/video/web_Animation_background_excited.mp4'
+import webGrateful from '@/assets/video/web_Animation_background_grateful.mp4'
+import webHappy from '@/assets/video/web_Animation_background_happy.mp4'
+import webSad from '@/assets/video/web_Animation_background_sad.mp4'
+import webTired from '@/assets/video/web_Animation_background_tired.mp4'
 
 // Debug logging for asset paths
 console.log('Asset paths check:', {
@@ -37,7 +35,7 @@ console.log('Asset paths check:', {
   webHappy,
   webSad,
   webTired,
-  'Using public folder paths': true
+  'Using imported asset paths': true
 })
 
 interface GalleryVideoProps {
