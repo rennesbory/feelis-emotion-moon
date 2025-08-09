@@ -174,7 +174,7 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
         muted
         loop
         playsInline
-        className="w-full aspect-[9/16] object-cover rounded-[20px]"
+        className="w-full aspect-[9/16] object-cover"
         onError={handleVideoError}
         onLoadedData={handleVideoLoadedData}
         onLoadStart={() => {
@@ -183,72 +183,68 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
         }}
         onCanPlay={() => {
           console.log(`Can play video: ${video.src}`)
+        onCanPlay={() => {
         }}
-      />
-      
       {/* Play/Pause Button */}
-      <Button
-        size="icon"
+        style={{
+      {/* Play/Pause Button */}300"
         variant="outline"
-        className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-full glass-card opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-        onClick={togglePlayPause}
+        variant="outline"%, -50%)'
+        style={{
+          transform: 'translate(-50%, -50%)'
+        size="icon"
+        variant="outline"%, -50%)'
       >
-        {isPlaying ? (
-          <Pause className="w-4 h-4" />
-        ) : (
+        }}
           <Play className="w-4 h-4" />
-        )}
-      </Button>
-    </div>
-  )
+        style={{
+      >
+        }}
 }
+        style={{
+        onClick={togglePlayPause}
+      >n App() {
+        {isPlaying ? (
+}[lightboxOpen, setLightboxOpen] = useState(false)
+}tLightboxContent] = useState<{
 
-function App() {
-  const [lightboxOpen, setLightboxOpen] = useState(false)
-  const [lightboxContent, setLightboxContent] = useState<{
-    type: 'image' | 'video',
-    src: string,
-    alt?: string,
+    src: string,rror] = useState(false)
     index?: number
-  } | null>(null)
-  const [currentGalleryIndex, setCurrentGalleryIndex] = useState(-1)
-  const [email, setEmail] = useState('')
-  const [heroVideoError, setHeroVideoError] = useState(false)
-  const heroVideoRef = useRef<HTMLVideoElement>(null)
-
-  const galleryVideos = [
-    { src: webAngry, alt: 'Angry emotion background animation' },
+  const [lightboxOpen, setLightboxOpen] = useState(false)tion' },
+ntent, setLightboxContent] = useState<{
+function App() {tate(-1)
+    src: string,rror] = useState(false)
+    index?: number
+  const [lightboxOpen, setLightboxOpen] = useState(false)tion' },
     { src: webAnxious, alt: 'Anxious emotion background animation' },
     { src: webCalm, alt: 'Calm emotion background animation' },
-    { src: webEmpty, alt: 'Empty emotion background animation' },
-    { src: webExcited, alt: 'Excited emotion background animation' },
-    { src: webGrateful, alt: 'Grateful emotion background animation' },
-    { src: webHappy, alt: 'Happy emotion background animation' },
-    { src: webSad, alt: 'Sad emotion background animation' },
-    { src: webTired, alt: 'Tired emotion background animation' }
-  ]
 
-  // Add debug logging for gallery videos
-  console.log('Gallery videos:', galleryVideos)
+    { src: webExcited, alt: 'Excited emotion background animation' },
+ry videos:', galleryVideos)
 
   const features = [
     {
-      title: 'Emotion Journaling',
-      subtitle: 'Feelings in a Cozy Corner',
-      description: 'Rest your feelings on a little cushion for the day—guided by gentle psychology.'
-    },
-    {
-      title: 'Emotion Tracking',
+  ]
+  console.log('Gallery videos:', galleryVideos)
+Add debug logging for gallery videos
+  const features = [
+
+  const features = [
       subtitle: 'Your Feelings, Gently Mapped',
       description: 'See the soft paths your emotions take, mapped with care and grounded in emotion science.'
-    },
-    {
-      title: 'Gentle Reminders',
+  console.log('Gallery videos:', galleryVideos)
+
+  const features = [minders',
       subtitle: 'Little Moments, Big Calm',
       description: 'Even one mindful minute can ease your heart—rooted in simple, proven practices.'
     },
     {
       title: 'Daily Uplifting Words',
+      subtitle: 'Tiny Words, Warm Lift',
+      description: 'Small, cozy phrases crafted with a touch of positive psychology.'
+    },
+  ]
+
       subtitle: 'Tiny Words, Warm Lift',
       description: 'Small, cozy phrases crafted with a touch of positive psychology.'
     }
@@ -263,11 +259,6 @@ function App() {
   }
 
   const closeLightbox = () => {
-    setLightboxOpen(false)
-    setLightboxContent(null)
-    setCurrentGalleryIndex(-1)
-  }
-
   const navigateGallery = (direction: 'prev' | 'next') => {
     if (currentGalleryIndex === -1) return
     
@@ -460,7 +451,7 @@ function App() {
                 ) : (
                   <video
                     ref={heroVideoRef}
-                    className="w-full rounded-[20px]"
+                    className="w-full"
                     muted
                     playsInline
                     loop
