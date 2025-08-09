@@ -7,6 +7,7 @@ import { Play, X, Download, ArrowRight, ArrowLeft } from '@phosphor-icons/react'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 import { HowItWorks } from '@/components/HowItWorks'
+import heroVideo from '@/assets/video/emoly_intro_trim.mp4'
 
 function App() {
   const [lightboxOpen, setLightboxOpen] = useState(false)
@@ -197,13 +198,12 @@ function App() {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
               <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold leading-tight mb-6">
-                Breathe. Reflect. <br />
                 <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                  Feel better—beautifully.
+                  A soft place for your feelings.
                 </span>
               </h1>
               <p className="text-lg md:text-xl text-muted-foreground mb-8 leading-relaxed">
-                Feelis blends mindful breathing, emotion journaling, and a pastel, clay-like visual world that makes self-care feel delightful and light.
+                A cozy little journaling hug for your heart, guided by Pearll.
               </p>
               
               <div className="flex flex-wrap gap-4 mb-6">
@@ -251,7 +251,7 @@ function App() {
                   loop
                   poster="https://picsum.photos/300/600?random=7"
                 >
-                  <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" type="video/mp4" />
+                  <source src={heroVideo} type="video/mp4" />
                   Your browser does not support the video tag.
                 </video>
               </div>
