@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
-import { Play, X, Download, ArrowRight, ArrowLeft } from '@phosphor-icons/react'
+import { Play, X, Download, ArrowRight, ArrowLeft, Pause } from '@phosphor-icons/react'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 import { HowItWorks } from '@/components/HowItWorks'
@@ -17,6 +17,70 @@ import webGrateful from '@/assets/video/web_Animation_background_grateful.mp4'
 import webHappy from '@/assets/video/web_Animation_background_happy.mp4'
 import webSad from '@/assets/video/web_Animation_background_sad.mp4'
 import webTired from '@/assets/video/web_Animation_background_tired.mp4'
+
+interface GalleryVideoProps {
+  video: { src: string; alt: string }
+  index: number
+  onVideoClick: (content: any) => void
+}
+
+function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
+  const [isPlaying, setIsPlaying] = useState(true)
+  const videoRef = useRef<HTMLVideoElement>(null)
+
+  const togglePlayPause = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    const videoElement = videoRef.current
+    if (!videoElement) return
+
+    if (isPlaying) {
+      videoElement.pause()
+      setIsPlaying(false)
+    } else {
+      videoElement.play().catch(() => {})
+      setIsPlaying(true)
+    }
+  }
+
+  const handleVideoClick = () => {
+    onVideoClick({
+      type: 'video',
+      src: video.src,
+      alt: video.alt,
+      index
+    })
+  }
+
+  return (
+    <div className="gallery-video cursor-pointer group relative" onClick={handleVideoClick}>
+      <video
+        ref={videoRef}
+        src={video.src}
+        autoPlay
+        muted
+        loop
+        playsInline
+        className="w-full aspect-[9/16] object-cover"
+      >
+        Your browser does not support the video tag.
+      </video>
+      
+      {/* Play/Pause Button */}
+      <Button
+        size="icon"
+        variant="outline"
+        className="absolute top-4 right-4 rounded-full glass-card opacity-70 hover:opacity-100 transition-opacity"
+        onClick={togglePlayPause}
+      >
+        {isPlaying ? (
+          <Pause className="w-4 h-4" />
+        ) : (
+          <Play className="w-4 h-4" />
+        )}
+      </Button>
+    </div>
+  )
+}
 
 function App() {
   const [lightboxOpen, setLightboxOpen] = useState(false)
@@ -309,34 +373,18 @@ function App() {
               A world that feels like a hug
             </h2>
             <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-              Soft 3D clay textures, pastel light, and a consistent character style make the journey inviting.
+              Breathe with Pearll, write down your feelings. Her cozy pastel world is like a warm hug for your heart.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {galleryVideos.map((video, index) => (
-              <div 
+              <GalleryVideo 
                 key={index}
-                className="gallery-video cursor-pointer group"
-                onClick={() => openLightbox({
-                  type: 'video',
-                  src: video.src,
-                  alt: video.alt,
-                  index
-                })}
-              >
-                <video
-                  src={video.src}
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                  controls
-                  className="w-full h-64 object-cover"
-                >
-                  Your browser does not support the video tag.
-                </video>
-              </div>
+                video={video}
+                index={index}
+                onVideoClick={openLightbox}
+              />
             ))}
           </div>
         </div>
