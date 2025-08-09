@@ -8,24 +8,25 @@ import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 import { HowItWorks } from '@/components/HowItWorks'
 
-// Import assets - using direct paths as imports may not be working
-const heroVideo = '/src/assets/video/emoly_intro_trim.mp4'
-const feelisLogo = '/src/assets/images/feelis_logo.png'
-const webAngry = '/src/assets/video/web_Animation_background_angry.mp4'
-const webAnxious = '/src/assets/video/web_Animation_background_anxious.mp4'
-const webCalm = '/src/assets/video/web_Animation_background_calm.mp4'
-const webEmpty = '/src/assets/video/web_Animation_background_empty.mp4'
-const webExcited = '/src/assets/video/web_Animation_background_excited.mp4'
-const webGrateful = '/src/assets/video/web_Animation_background_grateful.mp4'
-const webHappy = '/src/assets/video/web_Animation_background_happy.mp4'
-const webSad = '/src/assets/video/web_Animation_background_sad.mp4'
-const webTired = '/src/assets/video/web_Animation_background_tired.mp4'
+// Import assets properly using Vite import system
+import heroVideo from '@/assets/video/emoly_intro_trim.mp4'
+import feelisLogo from '@/assets/images/feelis_logo.png'
+import webAngry from '@/assets/video/web_Animation_background_angry.mp4'
+import webAnxious from '@/assets/video/web_Animation_background_anxious.mp4'
+import webCalm from '@/assets/video/web_Animation_background_calm.mp4'
+import webEmpty from '@/assets/video/web_Animation_background_empty.mp4'
+import webExcited from '@/assets/video/web_Animation_background_excited.mp4'
+import webGrateful from '@/assets/video/web_Animation_background_grateful.mp4'
+import webHappy from '@/assets/video/web_Animation_background_happy.mp4'
+import webSad from '@/assets/video/web_Animation_background_sad.mp4'
+import webTired from '@/assets/video/web_Animation_background_tired.mp4'
 
 // Debug logging for asset paths
 console.log('Asset paths check:', {
   heroVideo,
   feelisLogo,
-  webAngry
+  webAngry,
+  'All assets imported successfully': true
 })
 
 interface GalleryVideoProps {
@@ -119,7 +120,15 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
     return (
       <div className="gallery-video cursor-pointer group relative bg-muted rounded-[20px] aspect-[9/16] flex flex-col items-center justify-center p-4">
         <p className="text-muted-foreground text-sm text-center">Video unavailable</p>
-        <p className="text-muted-foreground text-xs mt-1 text-center break-all">{video.src}</p>
+        <p className="text-muted-foreground text-xs mt-1 text-center opacity-70">
+          {video.src.split('/').pop()}
+        </p>
+        <button 
+          onClick={() => setHasError(false)}
+          className="mt-2 px-3 py-1 text-xs bg-muted-foreground/20 rounded-full hover:bg-muted-foreground/30 transition-colors"
+        >
+          Retry
+        </button>
       </div>
     )
   }
@@ -134,7 +143,10 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
         className="w-full aspect-[9/16] object-cover"
         onError={handleVideoError}
         onLoadedData={handleVideoLoadedData}
-        onLoadStart={() => console.log(`Loading video: ${video.src}`)}
+        onLoadStart={() => {
+          console.log(`Loading video: ${video.src}`)
+          console.log('Actual video element src:', videoRef.current?.src)
+        }}
         onCanPlay={() => console.log(`Can play video: ${video.src}`)}
         preload="metadata"
         crossOrigin="anonymous"
@@ -399,7 +411,22 @@ function App() {
                 {heroVideoError ? (
                   <div className="w-full aspect-[9/16] bg-muted rounded-[20px] flex flex-col items-center justify-center p-4">
                     <p className="text-muted-foreground text-center">Video unavailable</p>
-                    <p className="text-muted-foreground text-xs mt-2 text-center">{heroVideo}</p>
+                    <p className="text-muted-foreground text-xs mt-2 text-center opacity-70">
+                      {heroVideo.split('/').pop()}
+                    </p>
+                    <button 
+                      onClick={() => {
+                        setHeroVideoError(false)
+                        // Try to reload the video
+                        const video = heroVideoRef.current
+                        if (video) {
+                          video.load()
+                        }
+                      }}
+                      className="mt-3 px-4 py-2 text-sm bg-muted-foreground/20 rounded-full hover:bg-muted-foreground/30 transition-colors"
+                    >
+                      Retry
+                    </button>
                   </div>
                 ) : (
                   <video

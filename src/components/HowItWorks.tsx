@@ -1,14 +1,14 @@
 import { Card } from '@/components/ui/card'
 
-// Use direct paths for image assets
-const ss01 = '/src/assets/images/ss01.jpeg'
-const ss02 = '/src/assets/images/ss02.jpeg'
-const ss03 = '/src/assets/images/ss03.jpeg'
-const ss05 = '/src/assets/images/ss05.jpeg'
-const ss06 = '/src/assets/images/ss06.jpeg'
-const ss07 = '/src/assets/images/ss07.jpeg'
-const ss08 = '/src/assets/images/ss08.jpeg'
-const ss09 = '/src/assets/images/ss09.jpeg'
+// Import image assets properly using Vite import system
+import ss01 from '@/assets/images/ss01.jpeg'
+import ss02 from '@/assets/images/ss02.jpeg'
+import ss03 from '@/assets/images/ss03.jpeg'
+import ss05 from '@/assets/images/ss05.jpeg'
+import ss06 from '@/assets/images/ss06.jpeg'
+import ss07 from '@/assets/images/ss07.jpeg'
+import ss08 from '@/assets/images/ss08.jpeg'
+import ss09 from '@/assets/images/ss09.jpeg'
 
 // Step-by-step data with two images per step
 const howItWorksSteps = [
