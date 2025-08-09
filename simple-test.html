@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple React Test</title>
+</head>
+<body>
+    <div id="root">
+        <h1>Loading React app...</h1>
+        <p>If you see this, React hasn't loaded yet.</p>
+    </div>
+    
+    <script type="module">
+        // Simple test to see if React is working
+        console.log('Testing React import...');
+        
+        try {
+            import('/src/main.tsx').then(() => {
+                console.log('✅ React app imported successfully');
+                document.getElementById('root').innerHTML = '<h1>✅ React app loaded!</h1>';
+            }).catch(error => {
+                console.error('❌ Failed to import React app:', error);
+                document.getElementById('root').innerHTML = '<h1>❌ React app failed to load</h1><pre>' + error.message + '</pre>';
+            });
+        } catch (error) {
+            console.error('❌ Error in script:', error);
+            document.getElementById('root').innerHTML = '<h1>❌ Script error</h1><pre>' + error.message + '</pre>';
+        }
+    </script>
+</body>
+</html>

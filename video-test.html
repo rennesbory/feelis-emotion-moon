@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Test Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .video-container {
+            margin: 20px 0;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        video {
+            max-width: 100%;
+            height: auto;
+        }
+        .status {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        .loading { background-color: #d1ecf1; color: #0c5460; }
+    </style>
+</head>
+<body>
+    <h1>Video Test Page</h1>
+    <p>Testing if videos are loading correctly from the public directory.</p>
+
+    <div class="video-container">
+        <h2>Hero Video (emoly_intro_trim.mp4)</h2>
+        <video id="hero-video" controls muted style="width: 300px;">
+            <source src="/videos/emoly_intro_trim.mp4" type="video/mp4; codecs='avc1.42E01E, mp4a.40.2'">
+            <source src="/videos/emoly_intro_trim.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+        <div id="hero-status" class="status loading">Loading...</div>
+    </div>
+
+    <div class="video-container">
+        <h2>Gallery Video (web_Animation_background_happy.mp4)</h2>
+        <video id="gallery-video" controls muted style="width: 300px;">
+            <source src="/videos/web_Animation_background_happy.mp4" type="video/mp4; codecs='avc1.42E01E, mp4a.40.2'">
+            <source src="/videos/web_Animation_background_happy.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+        <div id="gallery-status" class="status loading">Loading...</div>
+    </div>
+
+    <div class="video-container">
+        <h2>All Video Paths Test</h2>
+        <div id="paths-status"></div>
+    </div>
+
+    <script>
+        // Test hero video
+        const heroVideo = document.getElementById('hero-video');
+        const heroStatus = document.getElementById('hero-status');
+        
+        heroVideo.addEventListener('loadeddata', () => {
+            heroStatus.textContent = '✅ Video loaded successfully!';
+            heroStatus.className = 'status success';
+        });
+        
+        heroVideo.addEventListener('error', (e) => {
+            heroStatus.textContent = '❌ Video failed to load: ' + e.target.error?.message;
+            heroStatus.className = 'status error';
+        });
+
+        // Test gallery video
+        const galleryVideo = document.getElementById('gallery-video');
+        const galleryStatus = document.getElementById('gallery-status');
+        
+        galleryVideo.addEventListener('loadeddata', () => {
+            galleryStatus.textContent = '✅ Video loaded successfully!';
+            galleryStatus.className = 'status success';
+        });
+        
+        galleryVideo.addEventListener('error', (e) => {
+            galleryStatus.textContent = '❌ Video failed to load: ' + e.target.error?.message;
+            galleryStatus.className = 'status error';
+        });
+
+        // Test all video paths
+        const videoPaths = [
+            '/videos/emoly_intro_trim.mp4',
+            '/videos/web_Animation_background_angry.mp4',
+            '/videos/web_Animation_background_anxious.mp4',
+            '/videos/web_Animation_background_calm.mp4',
+            '/videos/web_Animation_background_empty.mp4',
+            '/videos/web_Animation_background_excited.mp4',
+            '/videos/web_Animation_background_grateful.mp4',
+            '/videos/web_Animation_background_happy.mp4',
+            '/videos/web_Animation_background_sad.mp4',
+            '/videos/web_Animation_background_tired.mp4'
+        ];
+
+        const pathsStatus = document.getElementById('paths-status');
+        
+        async function checkVideoPaths() {
+            let results = '';
+            for (const path of videoPaths) {
+                try {
+                    const response = await fetch(path, { method: 'HEAD' });
+                    if (response.ok) {
+                        results += `<div style="color: green;">✅ ${path}</div>`;
+                    } else {
+                        results += `<div style="color: red;">❌ ${path} (${response.status})</div>`;
+                    }
+                } catch (error) {
+                    results += `<div style="color: red;">❌ ${path} (Error: ${error.message})</div>`;
+                }
+            }
+            pathsStatus.innerHTML = results;
+        }
+
+        checkVideoPaths();
+    </script>
+</body>
+</html>
