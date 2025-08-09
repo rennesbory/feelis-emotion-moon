@@ -5,6 +5,8 @@ import ss03 from '@/assets/images/ss03.jpeg'
 import ss05 from '@/assets/images/ss05.jpeg'
 import ss06 from '@/assets/images/ss06.jpeg'
 import ss07 from '@/assets/images/ss07.jpeg'
+import ss08 from '@/assets/images/ss08.jpeg'
+import ss09 from '@/assets/images/ss09.jpeg'
 
 // Step-by-step data with two images per step
 const howItWorksSteps = [
@@ -50,6 +52,21 @@ const howItWorksSteps = [
       {
         src: ss07,
         alt: "Insights and analytics view"
+      }
+    ]
+  },
+  {
+    step: "04",
+    title: "Find a Moment of Calm",
+    description: "Start or end your day with a thoughtful quote presented in a serene, interactive world. Personalize the scene to match your vibe and find a quiet, beautiful space for a moment of reflection.",
+    images: [
+      {
+        src: ss08,
+        alt: "Interactive calm world with thoughtful quote"
+      },
+      {
+        src: ss09,
+        alt: "Personalized serene reflection space"
       }
     ]
   }
