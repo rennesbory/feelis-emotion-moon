@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Video Test</title>
+</head>
+<body>
+    <h1>Video Test Page</h1>
+    
+    <h2>Hero Video</h2>
+    <video controls muted style="width: 300px;">
+        <source src="/videos/emoly_intro_trim.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+    
+    <h2>Gallery Video (Angry)</h2>
+    <video controls muted style="width: 300px;">
+        <source src="/videos/web_Animation_background_angry.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+    
+    <script>
+        console.log('Testing video paths:');
+        console.log('Hero video:', '/videos/emoly_intro_trim.mp4');
+        console.log('Gallery video:', '/videos/web_Animation_background_angry.mp4');
+        
+        // Test if videos can load
+        const testVideo = document.createElement('video');
+        testVideo.src = '/videos/emoly_intro_trim.mp4';
+        testVideo.onloadeddata = () => console.log('Test video loaded successfully');
+        testVideo.onerror = (e) => console.error('Test video failed to load:', e);
+    </script>
+</body>
+</html>

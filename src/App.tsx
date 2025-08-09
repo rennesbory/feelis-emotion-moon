@@ -8,18 +8,20 @@ import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 import { HowItWorks } from '@/components/HowItWorks'
 
-// Import assets properly using Vite import system
-import heroVideo from '@/assets/video/emoly_intro_trim.mp4'
+// Import image assets properly using Vite import system
 import feelisLogo from '@/assets/images/feelis_logo.png'
-import webAngry from '@/assets/video/web_Animation_background_angry.mp4'
-import webAnxious from '@/assets/video/web_Animation_background_anxious.mp4'
-import webCalm from '@/assets/video/web_Animation_background_calm.mp4'
-import webEmpty from '@/assets/video/web_Animation_background_empty.mp4'
-import webExcited from '@/assets/video/web_Animation_background_excited.mp4'
-import webGrateful from '@/assets/video/web_Animation_background_grateful.mp4'
-import webHappy from '@/assets/video/web_Animation_background_happy.mp4'
-import webSad from '@/assets/video/web_Animation_background_sad.mp4'
-import webTired from '@/assets/video/web_Animation_background_tired.mp4'
+
+// Use public directory paths for video assets (more reliable for large media files)
+const heroVideo = '/videos/emoly_intro_trim.mp4'
+const webAngry = '/videos/web_Animation_background_angry.mp4'
+const webAnxious = '/videos/web_Animation_background_anxious.mp4'
+const webCalm = '/videos/web_Animation_background_calm.mp4'
+const webEmpty = '/videos/web_Animation_background_empty.mp4'
+const webExcited = '/videos/web_Animation_background_excited.mp4'
+const webGrateful = '/videos/web_Animation_background_grateful.mp4'
+const webHappy = '/videos/web_Animation_background_happy.mp4'
+const webSad = '/videos/web_Animation_background_sad.mp4'
+const webTired = '/videos/web_Animation_background_tired.mp4'
 
 // Debug logging for asset paths
 console.log('Asset paths check:', {
@@ -39,6 +41,7 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
   const [isPlaying, setIsPlaying] = useState(false)
   const [hasError, setHasError] = useState(false)
   const [isLoaded, setIsLoaded] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
   const videoRef = useRef<HTMLVideoElement>(null)
 
   const togglePlayPause = (e: React.MouseEvent) => {
@@ -73,6 +76,8 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
     console.error(`Failed to load video: ${video.src}`)
     console.error('Video error details:', {
       src: video.src,
+      actualSrc: target.src,
+      currentSrc: target.currentSrc,
       networkState: target.networkState,
       readyState: target.readyState,
       error: target.error?.code,
@@ -102,17 +107,34 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
   }
 
   const handleVideoLoadedData = () => {
+    console.log(`Video loaded successfully: ${video.src}`)
     setHasError(false)
     setIsLoaded(true)
+    setIsLoading(false)
     // Try to auto-play muted video
     const videoElement = videoRef.current
     if (videoElement) {
       videoElement.play()
-        .then(() => setIsPlaying(true))
-        .catch(() => {
+        .then(() => {
+          console.log(`Auto-play started for: ${video.src}`)
+          setIsPlaying(true)
+        })
+        .catch((error) => {
+          console.log(`Auto-play failed for: ${video.src}`, error)
           // Auto-play failed, that's fine - user can click play
           setIsPlaying(false)
         })
+    }
+  }
+
+  const retryVideoLoad = () => {
+    setHasError(false)
+    setIsLoaded(false)
+    setIsLoading(true)
+    const videoElement = videoRef.current
+    if (videoElement) {
+      // Force reload the video
+      videoElement.load()
     }
   }
 
@@ -124,11 +146,23 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
           {video.src.split('/').pop()}
         </p>
         <button 
-          onClick={() => setHasError(false)}
+          onClick={retryVideoLoad}
           className="mt-2 px-3 py-1 text-xs bg-muted-foreground/20 rounded-full hover:bg-muted-foreground/30 transition-colors"
         >
           Retry
         </button>
+      </div>
+    )
+  }
+
+  if (isLoading) {
+    return (
+      <div className="gallery-video cursor-pointer group relative bg-muted rounded-[20px] aspect-[9/16] flex flex-col items-center justify-center p-4">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        <p className="text-muted-foreground text-sm text-center mt-2">Loading video...</p>
+        <p className="text-muted-foreground text-xs mt-1 text-center opacity-70">
+          {video.src.split('/').pop()}
+        </p>
       </div>
     )
   }
@@ -146,10 +180,13 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
         onLoadStart={() => {
           console.log(`Loading video: ${video.src}`)
           console.log('Actual video element src:', videoRef.current?.src)
+          console.log('Video element currentSrc:', videoRef.current?.currentSrc)
+          setIsLoading(true)
         }}
         onCanPlay={() => console.log(`Can play video: ${video.src}`)}
+        onCanPlayThrough={() => console.log(`Can play through video: ${video.src}`)}
+        onProgress={() => console.log(`Loading progress for: ${video.src}`)}
         preload="metadata"
-        crossOrigin="anonymous"
       >
         <source src={video.src} type="video/mp4" />
         Your browser does not support the video tag.
@@ -438,17 +475,27 @@ function App() {
                     preload="metadata"
                     onError={(e) => {
                       console.error('Hero video error:', e)
+                      console.error('Hero video src:', heroVideo)
+                      console.error('Hero video element src:', heroVideoRef.current?.src)
                       setHeroVideoError(true)
                     }}
                     onLoadedData={() => {
+                      console.log('Hero video loaded successfully')
                       setHeroVideoError(false)
                       // Try to auto-play
                       const video = heroVideoRef.current
                       if (video) {
-                        video.play().catch(() => {
+                        video.play().catch((error) => {
+                          console.log('Hero video auto-play failed:', error)
                           // Auto-play failed, that's fine
                         })
                       }
+                    }}
+                    onLoadStart={() => {
+                      console.log('Hero video load start:', heroVideo)
+                    }}
+                    onCanPlay={() => {
+                      console.log('Hero video can play')
                     }}
                   >
                     <source src={heroVideo} type="video/mp4" />
