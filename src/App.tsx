@@ -6,6 +6,7 @@ import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { Play, X, Download, ArrowRight, ArrowLeft } from '@phosphor-icons/react'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
+import { HowItWorks } from '@/components/HowItWorks'
 
 function App() {
   const [lightboxOpen, setLightboxOpen] = useState(false)
@@ -170,6 +171,9 @@ function App() {
               <button onClick={() => scrollToSection('features')} className="font-semibold opacity-85 hover:opacity-100 transition-opacity">
                 Features
               </button>
+              <button onClick={() => scrollToSection('how-it-works')} className="font-semibold opacity-85 hover:opacity-100 transition-opacity">
+                How It Works
+              </button>
               <button onClick={() => scrollToSection('gallery')} className="font-semibold opacity-85 hover:opacity-100 transition-opacity">
                 Gallery
               </button>
@@ -281,6 +285,9 @@ function App() {
           </div>
         </div>
       </section>
+
+      {/* How It Works Section */}
+      <HowItWorks />
 
       {/* Gallery Section */}
       <section id="gallery" className="py-20 px-6">
@@ -450,6 +457,9 @@ function App() {
               <div className="space-y-2">
                 <button onClick={() => scrollToSection('features')} className="block text-muted-foreground hover:text-foreground transition-colors">
                   Features
+                </button>
+                <button onClick={() => scrollToSection('how-it-works')} className="block text-muted-foreground hover:text-foreground transition-colors">
+                  How It Works
                 </button>
                 <button onClick={() => scrollToSection('gallery')} className="block text-muted-foreground hover:text-foreground transition-colors">
                   Gallery
