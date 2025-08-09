@@ -1,4 +1,10 @@
 import { Card } from '@/components/ui/card'
+import ss01 from '@/assets/images/ss01.jpeg'
+import ss02 from '@/assets/images/ss02.jpeg'
+import ss03 from '@/assets/images/ss03.jpeg'
+import ss05 from '@/assets/images/ss05.jpeg'
+import ss06 from '@/assets/images/ss06.jpeg'
+import ss07 from '@/assets/images/ss07.jpeg'
 
 // Step-by-step data with two images per step
 const howItWorksSteps = [
@@ -8,11 +14,11 @@ const howItWorksSteps = [
     description: "Start by choosing the feeling that best represents your moment. Our beautiful, expressive characters make it easy to identify and acknowledge your emotions.",
     images: [
       {
-        src: "https://picsum.photos/300/600?random=10",
+        src: ss03,
         alt: "Emotion selection screen with character grid"
       },
       {
-        src: "https://picsum.photos/300/600?random=11", 
+        src: ss02, 
         alt: "Character selection interface"
       }
     ]
@@ -23,11 +29,11 @@ const howItWorksSteps = [
     description: "Write as much or as little as you want. Our thoughtful, context-aware prompts help guide your reflection in a calm, pressure-free environment that adapts to your mood.",
     images: [
       {
-        src: "https://picsum.photos/300/600?random=12",
+        src: ss05,
         alt: "Journaling interface with gentle prompts"
       },
       {
-        src: "https://picsum.photos/300/600?random=13",
+        src: ss01,
         alt: "Writing screen with cozy background"
       }
     ]
@@ -38,11 +44,11 @@ const howItWorksSteps = [
     description: "See your emotional world unfold through simple, beautiful charts. Understand your most frequent feelings and discover gentle insights over time.",
     images: [
       {
-        src: "https://picsum.photos/300/600?random=14",
+        src: ss06,
         alt: "Emotional patterns chart"
       },
       {
-        src: "https://picsum.photos/300/600?random=15",
+        src: ss07,
         alt: "Insights and analytics view"
       }
     ]
