@@ -7,17 +7,30 @@ import { Play, X, Download, ArrowRight, ArrowLeft, Pause } from '@phosphor-icons
 import { cn } from '@/lib/utils'
 import { toast, Toaster } from 'sonner'
 import { HowItWorks } from '@/components/HowItWorks'
-import { VideoTest } from '@/components/VideoTest'
-import { SimpleVideoTest } from '@/components/SimpleVideoTest'
 
 
-// Import static assets (only images need to be imported)
+// Import static assets
 import feelisLogo from '@/assets/images/feelis_logo.png'
 
-// Use simple public paths for videos since they're more reliable
-const heroVideoSrc = '/videos/emoly_intro_trim.mp4'
+// Import videos directly for reliable path resolution
+import heroVideo from '@/assets/videos/emoly_intro_trim.mp4'
+import webAngry from '@/assets/videos/web_Animation_background_angry.mp4'
+import webAnxious from '@/assets/videos/web_Animation_background_anxious.mp4'
+import webCalm from '@/assets/videos/web_Animation_background_calm.mp4'
+import webEmpty from '@/assets/videos/web_Animation_background_empty.mp4'
+import webExcited from '@/assets/videos/web_Animation_background_excited.mp4'
+import webGrateful from '@/assets/videos/web_Animation_background_grateful.mp4'
+import webHappy from '@/assets/videos/web_Animation_background_happy.mp4'
+import webSad from '@/assets/videos/web_Animation_background_sad.mp4'
+import webTired from '@/assets/videos/web_Animation_background_tired.mp4'
 
-console.log('🎬 Using public video paths - Hero video:', heroVideoSrc)
+// Debug: Log video paths in production to verify they're correct
+if (import.meta.env.PROD) {
+  console.log('🎬 Production Video Paths:', {
+    heroVideo,
+    galleryVideos: [webAngry, webAnxious, webCalm, webEmpty, webExcited, webGrateful, webHappy, webSad, webTired]
+  })
+}
 
 
 
@@ -170,21 +183,33 @@ function App() {
     index?: number
   } | null>(null)
 
-  // Use simple public paths for gallery videos
-  const galleryVideos = [
-    { src: '/videos/web_Animation_background_angry.mp4', alt: 'Angry emotion background animation' },
-    { src: '/videos/web_Animation_background_anxious.mp4', alt: 'Anxious emotion background animation' },
-    { src: '/videos/web_Animation_background_calm.mp4', alt: 'Calm emotion background animation' },
-    { src: '/videos/web_Animation_background_empty.mp4', alt: 'Empty emotion background animation' },
-    { src: '/videos/web_Animation_background_excited.mp4', alt: 'Excited emotion background animation' },
-    { src: '/videos/web_Animation_background_grateful.mp4', alt: 'Grateful emotion background animation' },
-    { src: '/videos/web_Animation_background_happy.mp4', alt: 'Happy emotion background animation' },
-    { src: '/videos/web_Animation_background_sad.mp4', alt: 'Sad emotion background animation' },
-    { src: '/videos/web_Animation_background_tired.mp4', alt: 'Tired emotion background animation' }
-  ]
+  // Debug video imports on mount
+  useEffect(() => {
+    console.log('🎥 App mounted - checking video imports:')
+    console.log('Hero video path:', heroVideo)
+    console.log('Gallery video paths:', galleryVideos.map(v => v.src))
+    
+    // Check if any imports are undefined
+    const allVideos = [heroVideo, ...galleryVideos.map(v => v.src)]
+    const failedImports = allVideos.filter(v => !v || v === undefined)
+    if (failedImports.length > 0) {
+      console.error('⚠️ Failed video imports detected:', failedImports.length)
+    } else {
+      console.log('✅ All video imports successful')
+    }
+  }, [])
 
-  // Debug: Log all video paths to console
-  console.log('🎬 Gallery videos:', galleryVideos.map(v => v.src))
+  const galleryVideos = [
+    { src: webAngry, alt: 'Angry emotion background animation' },
+    { src: webAnxious, alt: 'Anxious emotion background animation' },
+    { src: webCalm, alt: 'Calm emotion background animation' },
+    { src: webEmpty, alt: 'Empty emotion background animation' },
+    { src: webExcited, alt: 'Excited emotion background animation' },
+    { src: webGrateful, alt: 'Grateful emotion background animation' },
+    { src: webHappy, alt: 'Happy emotion background animation' },
+    { src: webSad, alt: 'Sad emotion background animation' },
+    { src: webTired, alt: 'Tired emotion background animation' }
+  ]
 
 
 
@@ -302,8 +327,6 @@ function App() {
   return (
     <div className="min-h-screen">
       <Toaster richColors position="top-right" />
-      <VideoTest />
-      <SimpleVideoTest />
       {/* Header */}
       <header className="sticky top-0 z-50 glass-card border-b">
         <div className="container mx-auto px-6">
@@ -418,7 +441,7 @@ function App() {
                 ) : (
                   <video
                     ref={heroVideoRef}
-                    src={heroVideoSrc}
+                    src={heroVideo}
                     className="w-full rounded-[20px]"
                     muted
                     playsInline
@@ -427,7 +450,7 @@ function App() {
                     onError={(e) => {
                       console.error('Hero video failed to load:', {
                         error: e.type,
-                        src: heroVideoSrc,
+                        src: heroVideo,
                         currentSrc: heroVideoRef.current?.currentSrc,
                         networkState: heroVideoRef.current?.networkState,
                         readyState: heroVideoRef.current?.readyState
@@ -519,7 +542,7 @@ function App() {
                 controls
                 playsInline
               >
-                <source src={heroVideoSrc} type="video/mp4" />
+                <source src={heroVideo} type="video/mp4" />
                 Your browser does not support the video tag.
               </video>
             </div>
@@ -537,7 +560,7 @@ function App() {
                   size="lg"
                   onClick={() => openLightbox({
                     type: 'video',
-                    src: heroVideoSrc
+                    src: heroVideo
                   })}
                   className="rounded-xl"
                 >
