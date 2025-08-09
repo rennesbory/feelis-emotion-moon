@@ -136,7 +136,7 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
       videoElement.src = video.src
       videoElement.load()
     }
-  }, [video.src, isLoaded, hasError])
+  }, [video.src])
 
   if (hasError) {
     return (
@@ -154,6 +154,7 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
       </div>
     )
   }
+
   if (isLoading) {
     return (
       <div className="gallery-video cursor-pointer group relative bg-muted rounded-[20px] aspect-[9/16] flex flex-col items-center justify-center p-4">
@@ -183,19 +184,13 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
         onCanPlay={() => {
           console.log(`Can play video: ${video.src}`)
         }}
-      >
-        <source src={video.src} type="video/mp4" />
-        Your browser does not support the video tag.
-      </video>
+      />
       
       {/* Play/Pause Button */}
       <Button
         size="icon"
         variant="outline"
-        className="absolute top-1/2 left-1/2 rounded-full glass-card opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-        style={{
-          transform: 'translate(-50%, -50%)'
-        }}
+        className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-full glass-card opacity-0 group-hover:opacity-100 transition-opacity duration-300"
         onClick={togglePlayPause}
       >
         {isPlaying ? (
@@ -209,7 +204,6 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
 }
 
 function App() {
-  const [email, setEmail] = useState('')
   const [lightboxOpen, setLightboxOpen] = useState(false)
   const [lightboxContent, setLightboxContent] = useState<{
     type: 'image' | 'video',
@@ -218,9 +212,10 @@ function App() {
     index?: number
   } | null>(null)
   const [currentGalleryIndex, setCurrentGalleryIndex] = useState(-1)
+  const [email, setEmail] = useState('')
   const [heroVideoError, setHeroVideoError] = useState(false)
   const heroVideoRef = useRef<HTMLVideoElement>(null)
-  // Gallery videos - all web animation backgrounds
+
   const galleryVideos = [
     { src: webAngry, alt: 'Angry emotion background animation' },
     { src: webAnxious, alt: 'Anxious emotion background animation' },
@@ -465,7 +460,7 @@ function App() {
                 ) : (
                   <video
                     ref={heroVideoRef}
-                    className="w-full"
+                    className="w-full rounded-[20px]"
                     muted
                     playsInline
                     loop
