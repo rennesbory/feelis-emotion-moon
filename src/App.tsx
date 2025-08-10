@@ -23,7 +23,18 @@ import webHappy from '@/assets/videos/web_Animation_background_happy.mp4'
 import webSad from '@/assets/videos/web_Animation_background_sad.mp4'
 import webTired from '@/assets/videos/web_Animation_background_tired.mp4'
 
-
+// Gallery videos array
+const galleryVideos = [
+  { src: webAngry, alt: 'Angry emotion background animation' },
+  { src: webAnxious, alt: 'Anxious emotion background animation' },
+  { src: webCalm, alt: 'Calm emotion background animation' },
+  { src: webEmpty, alt: 'Empty emotion background animation' },
+  { src: webExcited, alt: 'Excited emotion background animation' },
+  { src: webGrateful, alt: 'Grateful emotion background animation' },
+  { src: webHappy, alt: 'Happy emotion background animation' },
+  { src: webSad, alt: 'Sad emotion background animation' },
+  { src: webTired, alt: 'Tired emotion background animation' }
+]
 
 interface GalleryVideoProps {
   video: { src: string; alt: string }
@@ -69,19 +80,24 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
 
   const handleRetry = (e: React.MouseEvent) => {
     e.stopPropagation()
+    setHasError(false)
     setIsLoading(true)
     const videoElement = videoRef.current
     if (videoElement) {
       videoElement.load()
     }
-    }
+  }
 
   const handleLoadedData = () => {
-  const handleLoadedData = () => {
+    setIsLoading(false)
+    setHasError(false)
+    // Auto-play on load
+    const videoElement = videoRef.current
+    if (videoElement) {
       videoElement.play().catch((e) => {
-    setIsLoading(false), e.message)
+        console.warn(`Auto-play failed for video ${index}:`, e.message)
       })
-    
+    }
   }
 
   const handleError = (e: any) => {
@@ -95,58 +111,56 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
     setIsLoading(false)
   }
 
-  return (
-    <div className="gallery-video cursor-pointer group relative" onClick={handleVideoClick}>
-    })
-        <div className="absolute inset-0 bg-muted rounded-[20px] flex items-center justify-center z-10">
-    setIsLoading(false)
-  } border-t-transparent rounded-full mx-auto mb-2"></div>
- className="text-muted-foreground text-sm">Loading video...</p>
-  return (
-    <div className="gallery-video cursor-pointer group relative" onClick={handleVideoClick}>
-      )}
-        <div className="absolute inset-0 bg-muted rounded-[20px] flex items-center justify-center z-10">
-      {hasError ? (
+  if (isLoading) {
+    return (
+      <div className="gallery-video cursor-pointer group relative" onClick={handleVideoClick}>
+        <div className="w-full aspect-[9/16] bg-muted rounded-[20px] flex items-center justify-center">
+          <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full mx-auto mb-2"></div>
+          <p className="text-muted-foreground text-sm">Loading video...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (hasError) {
+    return (
+      <div className="gallery-video cursor-pointer group relative" onClick={handleVideoClick}>
         <div className="w-full aspect-[9/16] bg-muted rounded-[20px] flex flex-col items-center justify-center p-4">
           <p className="text-muted-foreground text-sm text-center mb-2">Video unavailable</p>
           <p className="text-muted-foreground text-xs text-center opacity-70 mb-3">
-        </div>
-      )}
-      
+            Video {index + 1}
+          </p>
+          <Button
             size="sm"
             variant="outline"
             onClick={handleRetry}
             className="text-xs"
-            Video {index + 1}
-          </p>
-          <Button
+          >
+            Retry
+          </Button>
         </div>
-      ) : (
-        <video
-          ref={videoRef}
-          src={video.src}
-            Retryded-[20px]"
-          muted
-          loop
-          playsInline
-        <video
-          onError={handleError}
-          onLoadedData={handleLoadedData}
-          onCanPlay={() => setIsLoading(false)}
-          onPause={() => setIsPlaying(false)}
-          onPlay={() => setIsPlaying(true)}
-        >
-          Your browser does not support the video tag.
-        </video>
-      )}
+      </div>
+    )
+  }
 
-      {/* Play/Pause Button */}
-      {!isLoading && !hasError && (
-        <Button
-          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 glass-card"
-        </video>
-          variant="outline"
-ogglePlayPause}
+  return (
+    <div className="gallery-video cursor-pointer group relative" onClick={handleVideoClick}>
+      <video
+        ref={videoRef}
+        src={video.src}
+        className="w-full aspect-[9/16] object-cover rounded-[20px]"
+        muted
+        loop
+        playsInline
+        onError={handleError}
+        onLoadedData={handleLoadedData}
+        onCanPlay={() => setIsLoading(false)}
+        onPause={() => setIsPlaying(false)}
+        onPlay={() => setIsPlaying(true)}
+      >
+        Your browser does not support the video tag.
+      </video>
+
       {/* Play/Pause Button */}
       {!isLoading && !hasError && (
         <Button
@@ -156,6 +170,13 @@ ogglePlayPause}
           onClick={togglePlayPause}
         >
           {isPlaying ? (
+            <Pause className="w-4 h-4" />
+          ) : (
+            <Play className="w-4 h-4" />
+          )}
+        </Button>
+      )}
+    </div>
   )
 }
 
@@ -181,29 +202,13 @@ function App() {
     console.log('All video paths:', allVideos)
     
     const failedImports = allVideos.filter(v => !v || v === undefined || v === '')
-    console.log('🎬 Video Import Debug:')
-    console.log('Hero Video:', heroVideo)
-      console.log('✅ All video imports successful')
-    { src: webCalm, alt: 'Calm emotion background animation' },
-    console.log('All video paths:', allVideos)
-    
-    const failedImports = allVideos.filter(v => !v || v === undefined || v === '')
-    { src: webHappy, alt: 'Happy emotion background animation' },
-    { src: webSad, alt: 'Sad emotion background animation' },
-    } else {nimation' }
+    if (failedImports.length > 0) {
+      console.error('❌ Failed video imports:', failedImports)
+    } else {
       console.log('✅ All video imports successful')
     }
-    { src: webCalm, alt: 'Calm emotion background animation' },
-      const status = video.src && video.src !== '' ? 'SUCCESS' : 'FAILED'
-      console.log(`${index + 1}. ${status}:`, video.src)
-    })
-  }, [])
-
-    { src: webTired, alt: 'Tired emotion background animation' }
-  ]
-
-  // Verify video imports
-  useEffect(() => {
+    
+    // Verify gallery videos
     console.log('📹 Gallery Videos Import Check:')
     galleryVideos.forEach((video, index) => {
       const status = video.src && video.src !== '' ? 'SUCCESS' : 'FAILED'
@@ -211,8 +216,18 @@ function App() {
     })
   }, [])
 
-
-
+  const features = [
+    {
+      title: 'Emotion Journaling',
+      subtitle: 'Feelings in a Cozy Corner',
+      description: 'Rest your feelings on a little cushion for the day—guided by gentle psychology.'
+    },
+    {
+      title: 'Emotion Tracking',
+      subtitle: 'Your Feelings, Gently Mapped',
+      description: 'See the soft paths your emotions take, mapped with care and grounded in emotion science.'
+    },
+    {
       title: 'Gentle Reminders',
       subtitle: 'Little Moments, Big Calm',
       description: 'Even one mindful minute can ease your heart—rooted in simple, proven practices.'
@@ -222,17 +237,17 @@ function App() {
       subtitle: 'Tiny Words, Warm Lift',
       description: 'Small, cozy phrases crafted with a touch of positive psychology.'
     }
-      description: 'See the soft paths your emotions take, mapped with care and grounded in emotion science.'
-    },
-    {) => {
-      title: 'Gentle Reminders',
-      subtitle: 'Little Moments, Big Calm',
-      description: 'Even one mindful minute can ease your heart—rooted in simple, proven practices.'
-    },
-    {
-      title: 'Daily Uplifting Words',
-      subtitle: 'Tiny Words, Warm Lift',
-      description: 'Small, cozy phrases crafted with a touch of positive psychology.'
+  ]
+
+  const openLightbox = (content: { type: 'image' | 'video'; src: string; alt?: string; index?: number }) => {
+    setLightboxContent(content)
+    setLightboxOpen(true)
+    setCurrentGalleryIndex(content.index ?? -1)
+  }
+
+  const closeLightbox = () => {
+    setLightboxOpen(false)
+    setLightboxContent(null)
     setCurrentGalleryIndex(-1)
   }
 
@@ -301,6 +316,9 @@ function App() {
             })
           }
         })
+      },
+      { threshold: 0.2 }
+    )
 
     observer.observe(video)
     return () => observer.disconnect()
@@ -318,9 +336,9 @@ function App() {
               className="flex items-center gap-3 font-bold text-lg"
             >
               <img 
-    return () => observer.disconnect()
-  }, [heroVideoError])
-
+                src={feelisLogo} 
+                alt="Feelis logo" 
+                className="w-9 h-9 rounded-xl"
               />
               Feelis
             </button>
@@ -422,8 +440,10 @@ function App() {
                   <video
                     ref={heroVideoRef}
                     src={heroVideo}
+                    className="w-full aspect-[9/16] object-cover rounded-[20px]"
                     muted
                     loop
+                    playsInline
                     preload="metadata"
                     onError={(e) => {
                       console.error('Hero video failed to load:', heroVideo)
@@ -440,13 +460,19 @@ function App() {
                       }
                     }}
                   >
-                    loop
+                    Your browser does not support the video tag.
                   </video>
-                    onError={(e) => {
-                      console.error('Hero video failed to load:', heroVideo)
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Features Section */}
       <section id="features" className="py-20 px-6">
         <div className="container mx-auto">
+          <div className="text-center mb-16">
             <h2 className="text-3xl md:text-5xl font-bold mb-4">
               Designed for gentle progress
             </h2>
@@ -456,17 +482,17 @@ function App() {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                  >
-                    Your browser does not support the video tag.
-                  </video>
-                )}
-              </div>
-            </div>
-          </div>
+            {features.map((feature, index) => (
+              <Card key={index} className="p-6 glass-card border-0">
+                <h3 className="text-xl font-bold mb-2">{feature.title}</h3>
+                <p className="text-sm font-semibold text-muted-foreground mb-3 opacity-90">
+                  {feature.subtitle}
+                </p>
+                <p className="text-muted-foreground">{feature.description}</p>
               </Card>
             ))}
           </div>
-      {/* Features Section */}
+        </div>
       </section>
 
       {/* How It Works Section */}
@@ -517,19 +543,20 @@ function App() {
             <div className="device-frame rounded-3xl p-3 shadow-2xl">
               <video
                 className="w-full rounded-xl"
-
-          {/* Debug info - remove in production */}
-          <div className="mt-8 p-4 bg-muted/50 rounded-lg text-sm">
-            <h4 className="font-semibold mb-2">Video Status:</h4>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-              {galleryVideos.map((video, index) => (
-                <div key={index} className="flex items-center gap-2">
-                  <span className={`w-2 h-2 rounded-full ${video.src ? 'bg-green-500' : 'bg-red-500'}`}></span>
-                  <span className="text-xs">Video {index + 1}: {video.src ? '✅' : '❌'}</span>
-                </div>
-              ))}
+                src={heroVideo}
+                controls
+                playsInline
+                poster=""
+              >
+                Your browser does not support the video tag.
+              </video>
             </div>
-          </div>
+            
+            <div>
+              <h2 className="text-3xl md:text-5xl font-bold mb-6">
+                See Feelis in motion
+              </h2>
+              <p className="text-lg text-muted-foreground mb-8">
                 A short walkthrough of the breathing loop, emotion prompts, and the cozy visual system that makes you want to come back.
               </p>
               
@@ -550,19 +577,19 @@ function App() {
                   onClick={() => scrollToSection('features')}
                   className="rounded-xl glass-card"
                 >
-                See Feelis in motion
-              </h2>
-              <p className="text-lg text-muted-foreground mb-8">
-                A short walkthrough of the breathing loop, emotion prompts, and the cozy visual system that makes you want to come back.
-              </p>
-              
-              <div className="flex flex-wrap gap-4">
-                <Button 
-                  size="lg"
-                  onClick={() => openLightbox({
-                    type: 'video', text-center">
-                    src: heroVideoold mb-6">
-                  })}
+                  Explore Features
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Download Section */}
+      <section id="download" className="py-20 px-6">
+        <div className="container mx-auto text-center">
+          <h2 className="text-3xl md:text-5xl font-bold mb-6">
+            Get Feelis
           </h2>
           <p className="text-lg text-muted-foreground mb-8">
             Launching soon on the App Store. Add your email and we'll ping you on day one.
@@ -710,4 +737,3 @@ function App() {
 }
 
 export default App
-
