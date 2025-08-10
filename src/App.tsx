@@ -130,12 +130,12 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
         </div>
       ) : (
         <video
-          ref={videoRef}
-          src={video.src}
-          muted
-          loop
-          playsInline
-          preload="metadata"
+          console.error(`Gallery video ${index} failed to load:`, {
+            error: e.type,
+            src: video.src,
+            currentSrc: videoRef.current?.currentSrc,
+            networkState: videoRef.current?.networkState,
+            readyState: videoRef.current?.readyState
           className="w-full aspect-[9/16] object-cover rounded-[20px]"
           onError={handleError}
           onLoadedData={handleLoadedData}
@@ -193,11 +193,6 @@ function App() {
     } else {
       console.log('✅ All video imports successful')
     }
-  }, [])
-
-  const galleryVideos = [
-    { src: webAngry, alt: 'Angry emotion background animation' },
-    { src: webAnxious, alt: 'Anxious emotion background animation' },
     { src: webCalm, alt: 'Calm emotion background animation' },
     { src: webEmpty, alt: 'Empty emotion background animation' },
     { src: webExcited, alt: 'Excited emotion background animation' },
