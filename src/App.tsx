@@ -11,7 +11,7 @@ import { HowItWorks } from '@/components/HowItWorks'
 // Import static assets
 import feelisLogo from '@/assets/images/feelis_logo.png'
 
-// Import videos directly for reliable path resolution
+// Import videos directly using same pattern as images
 import heroVideo from '@/assets/videos/emoly_intro_trim.mp4'
 import webAngry from '@/assets/videos/web_Animation_background_angry.mp4'
 import webAnxious from '@/assets/videos/web_Animation_background_anxious.mp4'
@@ -36,6 +36,12 @@ const galleryVideos = [
   { src: webTired, alt: 'Tired emotion background animation' }
 ]
 
+// Debug: Log all imports at module level
+console.log('📥 Asset Import Status:')
+console.log('Image (logo):', feelisLogo)
+console.log('Hero video:', heroVideo)
+console.log('Gallery videos:', galleryVideos.map(v => v.src))
+
 interface GalleryVideoProps {
   video: { src: string; alt: string }
   index: number
@@ -52,7 +58,8 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
   useEffect(() => {
     setHasError(false)
     setIsLoading(true)
-  }, [video.src])
+    console.log(`Gallery video ${index} src:`, video.src)
+  }, [video.src, index])
 
   const togglePlayPause = (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -80,6 +87,7 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
 
   const handleRetry = (e: React.MouseEvent) => {
     e.stopPropagation()
+    console.log(`Retrying video ${index} with src:`, video.src)
     setHasError(false)
     setIsLoading(true)
     const videoElement = videoRef.current
@@ -89,6 +97,7 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
   }
 
   const handleLoadedData = () => {
+    console.log(`✅ Gallery video ${index} loaded successfully:`, video.src)
     setHasError(false)
     setIsLoading(false)
     // Auto-play on load
@@ -104,6 +113,8 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
     console.error(`❌ Gallery video ${index} error:`, {
       src: video.src,
       error: e.target?.error,
+      errorCode: e.target?.error?.code,
+      errorMessage: e.target?.error?.message,
       networkState: e.target?.networkState,
       readyState: e.target?.readyState
     })
@@ -111,12 +122,29 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
     setIsLoading(false)
   }
 
+  // Show source path for debugging
+  if (!video.src || video.src === '') {
+    return (
+      <div className="gallery-video cursor-pointer group relative" onClick={handleVideoClick}>
+        <div className="w-full aspect-[9/16] bg-muted rounded-[20px] flex flex-col items-center justify-center p-4">
+          <p className="text-muted-foreground text-center mb-2">No video source</p>
+          <p className="text-muted-foreground text-xs text-center opacity-70">
+            Video {index + 1} - Source: {video.src || 'undefined'}
+          </p>
+        </div>
+      </div>
+    )
+  }
+
   if (isLoading) {
     return (
       <div className="gallery-video cursor-pointer group relative" onClick={handleVideoClick}>
         <div className="w-full aspect-[9/16] bg-muted rounded-[20px] flex flex-col items-center justify-center p-4">
           <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full mx-auto mb-2"></div>
-          <p className="text-muted-foreground text-sm">Loading video...</p>
+          <p className="text-muted-foreground text-sm text-center">Loading video...</p>
+          <p className="text-muted-foreground text-xs text-center opacity-70 mt-1">
+            Video {index + 1}
+          </p>
         </div>
       </div>
     )
@@ -129,6 +157,9 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
           <p className="text-muted-foreground text-center mb-2">Video unavailable</p>
           <p className="text-muted-foreground text-xs text-center opacity-70 mb-3">
             Video {index + 1}
+          </p>
+          <p className="text-muted-foreground text-xs text-center opacity-50 mb-3 max-w-[90%] break-all">
+            {video.src}
           </p>
           <Button
             size="sm"
@@ -152,6 +183,7 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
         muted
         loop
         playsInline
+        preload="metadata"
         onError={handleError}
         onLoadedData={handleLoadedData}
         onCanPlay={() => setIsLoading(false)}
@@ -194,12 +226,33 @@ function App() {
   useEffect(() => {
     console.log('🎬 Video Import Debug:')
     console.log('Hero Video:', heroVideo)
+    console.log('Hero Video type:', typeof heroVideo)
+    console.log('Hero Video length:', heroVideo?.length)
     
     const allVideos = [heroVideo, ...galleryVideos.map(v => v.src)]
     console.log('All video paths:', allVideos)
     
+    // Check each individual import
+    console.log('Individual imports:')
+    console.log('webAngry:', webAngry)
+    console.log('webAnxious:', webAnxious)
+    console.log('webCalm:', webCalm)
+    console.log('webEmpty:', webEmpty)
+    console.log('webExcited:', webExcited)
+    console.log('webGrateful:', webGrateful)
+    console.log('webHappy:', webHappy)
+    console.log('webSad:', webSad)
+    console.log('webTired:', webTired)
+    
     if (allVideos.every(path => path && path !== '')) {
       console.log('✅ All video imports successful')
+    } else {
+      console.log('❌ Some video imports failed')
+      allVideos.forEach((path, index) => {
+        if (!path || path === '') {
+          console.log(`Failed import at index ${index}:`, path)
+        }
+      })
     }
     
     // Verify gallery videos
@@ -416,8 +469,12 @@ function App() {
                     <p className="text-muted-foreground text-xs text-center opacity-70 mb-3">
                       Hero video
                     </p>
+                    <p className="text-muted-foreground text-xs text-center opacity-50 mb-3 max-w-[90%] break-all">
+                      {heroVideo}
+                    </p>
                     <button 
                       onClick={() => {
+                        console.log('Retrying hero video:', heroVideo)
                         setHeroVideoError(false)
                         const video = heroVideoRef.current
                         if (video) {
@@ -439,10 +496,18 @@ function App() {
                     playsInline
                     preload="metadata"
                     onError={(e) => {
-                      console.error('Hero video failed to load:', heroVideo)
+                      console.error('❌ Hero video failed to load:', {
+                        src: heroVideo,
+                        error: e.target?.error,
+                        errorCode: e.target?.error?.code,
+                        errorMessage: e.target?.error?.message,
+                        networkState: e.target?.networkState,
+                        readyState: e.target?.readyState
+                      })
                       setHeroVideoError(true)
                     }}
                     onLoadedData={() => {
+                      console.log('✅ Hero video loaded successfully:', heroVideo)
                       setHeroVideoError(false)
                       // Try to auto-play
                       const video = heroVideoRef.current
@@ -516,7 +581,7 @@ function App() {
 
           {/* Debug info - remove in production */}
           <div className="mt-8 p-4 bg-muted/50 rounded-lg text-sm">
-            <h4 className="font-semibold mb-2">Video Status:</h4>
+            <h4 className="font-semibold mb-2">Gallery Video Status:</h4>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
               {galleryVideos.map((video, index) => (
                 <div key={index} className="flex items-center gap-2">
