@@ -11,17 +11,18 @@ import { HowItWorks } from '@/components/HowItWorks'
 // Import static assets
 import feelisLogo from '@/assets/images/feelis_logo.png'
 
-// Import videos directly for reliable path resolution
-import heroVideo from '@/assets/videos/emoly_intro_trim.mp4'
-import webAngry from '@/assets/videos/web_Animation_background_angry.mp4'
-import webAnxious from '@/assets/videos/web_Animation_background_anxious.mp4'
-import webCalm from '@/assets/videos/web_Animation_background_calm.mp4'
-import webEmpty from '@/assets/videos/web_Animation_background_empty.mp4'
-import webExcited from '@/assets/videos/web_Animation_background_excited.mp4'
-import webGrateful from '@/assets/videos/web_Animation_background_grateful.mp4'
-import webHappy from '@/assets/videos/web_Animation_background_happy.mp4'
-import webSad from '@/assets/videos/web_Animation_background_sad.mp4'
-import webTired from '@/assets/videos/web_Animation_background_tired.mp4'
+// Use public directory paths for video assets (more reliable for large media files)
+const baseUrl = import.meta.env.PROD ? '/feelis-emotion-moon' : ''
+const heroVideo = `${baseUrl}/videos/emoly_intro_trim.mp4`
+const webAngry = `${baseUrl}/videos/web_Animation_background_angry.mp4`
+const webAnxious = `${baseUrl}/videos/web_Animation_background_anxious.mp4`
+const webCalm = `${baseUrl}/videos/web_Animation_background_calm.mp4`
+const webEmpty = `${baseUrl}/videos/web_Animation_background_empty.mp4`
+const webExcited = `${baseUrl}/videos/web_Animation_background_excited.mp4`
+const webGrateful = `${baseUrl}/videos/web_Animation_background_grateful.mp4`
+const webHappy = `${baseUrl}/videos/web_Animation_background_happy.mp4`
+const webSad = `${baseUrl}/videos/web_Animation_background_sad.mp4`
+const webTired = `${baseUrl}/videos/web_Animation_background_tired.mp4`
 
 // Gallery videos array
 const galleryVideos = [
