@@ -69,26 +69,19 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
 
   const handleRetry = (e: React.MouseEvent) => {
     e.stopPropagation()
-    setHasError(false)
     setIsLoading(true)
     const videoElement = videoRef.current
     if (videoElement) {
       videoElement.load()
     }
-  }
+    }
 
   const handleLoadedData = () => {
-    console.log(`✅ Gallery video ${index} loaded:`, video.src)
-    setIsLoading(false)
-    setHasError(false)
-    
-    // Auto-play on load
-    const videoElement = videoRef.current
-    if (videoElement) {
+  const handleLoadedData = () => {
       videoElement.play().catch((e) => {
-        console.log(`Auto-play failed for video ${index}:`, e.message)
+    setIsLoading(false), e.message)
       })
-    }
+    
   }
 
   const handleError = (e: any) => {
@@ -104,39 +97,39 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
 
   return (
     <div className="gallery-video cursor-pointer group relative" onClick={handleVideoClick}>
-      {isLoading && !hasError && (
+    })
         <div className="absolute inset-0 bg-muted rounded-[20px] flex items-center justify-center z-10">
-          <div className="text-center">
-            <div className="animate-spin w-6 h-6 border-2 border-primary border-t-transparent rounded-full mx-auto mb-2"></div>
-            <p className="text-muted-foreground text-sm">Loading video...</p>
-          </div>
-        </div>
+    setIsLoading(false)
+  } border-t-transparent rounded-full mx-auto mb-2"></div>
+ className="text-muted-foreground text-sm">Loading video...</p>
+  return (
+    <div className="gallery-video cursor-pointer group relative" onClick={handleVideoClick}>
       )}
-      
+        <div className="absolute inset-0 bg-muted rounded-[20px] flex items-center justify-center z-10">
       {hasError ? (
         <div className="w-full aspect-[9/16] bg-muted rounded-[20px] flex flex-col items-center justify-center p-4">
           <p className="text-muted-foreground text-sm text-center mb-2">Video unavailable</p>
           <p className="text-muted-foreground text-xs text-center opacity-70 mb-3">
-            Video {index + 1}
-          </p>
-          <Button
+        </div>
+      )}
+      
             size="sm"
             variant="outline"
             onClick={handleRetry}
             className="text-xs"
-          >
-            Retry
-          </Button>
+            Video {index + 1}
+          </p>
+          <Button
         </div>
       ) : (
         <video
           ref={videoRef}
           src={video.src}
-          className="w-full aspect-[9/16] object-cover rounded-[20px]"
+            Retryded-[20px]"
           muted
           loop
           playsInline
-          preload="metadata"
+        <video
           onError={handleError}
           onLoadedData={handleLoadedData}
           onCanPlay={() => setIsLoading(false)}
@@ -151,18 +144,18 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
       {!isLoading && !hasError && (
         <Button
           className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 glass-card"
+        </video>
+          variant="outline"
+ogglePlayPause}
+      {/* Play/Pause Button */}
+      {!isLoading && !hasError && (
+        <Button
+          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 glass-card"
           size="icon"
           variant="outline"
           onClick={togglePlayPause}
         >
           {isPlaying ? (
-            <Pause className="w-4 h-4" />
-          ) : (
-            <Play className="w-4 h-4" />
-          )}
-        </Button>
-      )}
-    </div>
   )
 }
 
@@ -181,47 +174,45 @@ function App() {
 
   // Debug video imports on mount
   useEffect(() => {
-    console.log('🎬 Hero Video Import:', heroVideo)
-    console.log('🎬 Gallery Videos Import:')
-    galleryVideos.forEach((video, index) => {
-      console.log(`${index + 1}. ${video.alt}: ${video.src}`)
-    })
+    console.log('🎬 Video Import Debug:')
+    console.log('Hero Video:', heroVideo)
     
-    // Test if imports are working
     const allVideos = [heroVideo, ...galleryVideos.map(v => v.src)]
-    const validVideos = allVideos.filter(v => v && v !== '' && v !== undefined)
+    console.log('All video paths:', allVideos)
     
-    console.log(`✅ ${validVideos.length}/${allVideos.length} videos imported successfully`)
-    
-    if (validVideos.length !== allVideos.length) {
-      console.error('❌ Some video imports failed')
-    }
-  }, [])
-
-  const galleryVideos = [
-    { src: webAngry, alt: 'Angry emotion background animation' },
-    { src: webAnxious, alt: 'Anxious emotion background animation' },
+    const failedImports = allVideos.filter(v => !v || v === undefined || v === '')
+    console.log('🎬 Video Import Debug:')
+    console.log('Hero Video:', heroVideo)
+      console.log('✅ All video imports successful')
     { src: webCalm, alt: 'Calm emotion background animation' },
-    { src: webEmpty, alt: 'Empty emotion background animation' },
-    { src: webExcited, alt: 'Excited emotion background animation' },
-    { src: webGrateful, alt: 'Grateful emotion background animation' },
+    console.log('All video paths:', allVideos)
+    
+    const failedImports = allVideos.filter(v => !v || v === undefined || v === '')
     { src: webHappy, alt: 'Happy emotion background animation' },
     { src: webSad, alt: 'Sad emotion background animation' },
+    } else {nimation' }
+      console.log('✅ All video imports successful')
+    }
+    { src: webCalm, alt: 'Calm emotion background animation' },
+      const status = video.src && video.src !== '' ? 'SUCCESS' : 'FAILED'
+      console.log(`${index + 1}. ${status}:`, video.src)
+    })
+  }, [])
+
     { src: webTired, alt: 'Tired emotion background animation' }
   ]
 
-  const features = [
-    {
-      title: 'Emotion Journaling',
-      subtitle: 'Feelings in a Cozy Corner',
-      description: 'Rest your feelings on a little cushion for the day—guided by gentle psychology.'
-    },
-    {
-      title: 'Emotion Tracking',
-      subtitle: 'Your Feelings, Gently Mapped',
-      description: 'See the soft paths your emotions take, mapped with care and grounded in emotion science.'
-    },
-    {
+  // Verify video imports
+  useEffect(() => {
+    console.log('📹 Gallery Videos Import Check:')
+    galleryVideos.forEach((video, index) => {
+      const status = video.src && video.src !== '' ? 'SUCCESS' : 'FAILED'
+      console.log(`${index + 1}. ${status}:`, video.src)
+    })
+  }, [])
+
+
+
       title: 'Gentle Reminders',
       subtitle: 'Little Moments, Big Calm',
       description: 'Even one mindful minute can ease your heart—rooted in simple, proven practices.'
@@ -231,17 +222,17 @@ function App() {
       subtitle: 'Tiny Words, Warm Lift',
       description: 'Small, cozy phrases crafted with a touch of positive psychology.'
     }
-  ]
-
-  const openLightbox = (content: typeof lightboxContent) => {
-    setLightboxContent(content)
-    setCurrentGalleryIndex(content?.index ?? -1)
-    setLightboxOpen(true)
-  }
-
-  const closeLightbox = () => {
-    setLightboxOpen(false)
-    setLightboxContent(null)
+      description: 'See the soft paths your emotions take, mapped with care and grounded in emotion science.'
+    },
+    {) => {
+      title: 'Gentle Reminders',
+      subtitle: 'Little Moments, Big Calm',
+      description: 'Even one mindful minute can ease your heart—rooted in simple, proven practices.'
+    },
+    {
+      title: 'Daily Uplifting Words',
+      subtitle: 'Tiny Words, Warm Lift',
+      description: 'Small, cozy phrases crafted with a touch of positive psychology.'
     setCurrentGalleryIndex(-1)
   }
 
@@ -310,9 +301,6 @@ function App() {
             })
           }
         })
-      },
-      { threshold: 0.2 }
-    )
 
     observer.observe(video)
     return () => observer.disconnect()
@@ -330,9 +318,9 @@ function App() {
               className="flex items-center gap-3 font-bold text-lg"
             >
               <img 
-                src={feelisLogo} 
-                alt="Feelis logo" 
-                className="w-9 h-9 rounded-xl"
+    return () => observer.disconnect()
+  }, [heroVideoError])
+
               />
               Feelis
             </button>
@@ -434,9 +422,7 @@ function App() {
                   <video
                     ref={heroVideoRef}
                     src={heroVideo}
-                    className="w-full rounded-[20px]"
                     muted
-                    playsInline
                     loop
                     preload="metadata"
                     onError={(e) => {
@@ -454,19 +440,13 @@ function App() {
                       }
                     }}
                   >
-                    Your browser does not support the video tag.
+                    loop
                   </video>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
+                    onError={(e) => {
+                      console.error('Hero video failed to load:', heroVideo)
       {/* Features Section */}
       <section id="features" className="py-20 px-6">
         <div className="container mx-auto">
-          <div className="text-center mb-16">
             <h2 className="text-3xl md:text-5xl font-bold mb-4">
               Designed for gentle progress
             </h2>
@@ -476,17 +456,17 @@ function App() {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {features.map((feature, index) => (
-              <Card key={index} className="glass-card p-6 hover:shadow-xl transition-all duration-300 hover:scale-105">
-                <h3 className="text-xl font-bold mb-2">{feature.title}</h3>
-                <p className="text-sm font-semibold text-muted-foreground mb-3 opacity-90">
-                  {feature.subtitle}
-                </p>
-                <p className="text-muted-foreground">{feature.description}</p>
+                  >
+                    Your browser does not support the video tag.
+                  </video>
+                )}
+              </div>
+            </div>
+          </div>
               </Card>
             ))}
           </div>
-        </div>
+      {/* Features Section */}
       </section>
 
       {/* How It Works Section */}
@@ -537,19 +517,19 @@ function App() {
             <div className="device-frame rounded-3xl p-3 shadow-2xl">
               <video
                 className="w-full rounded-xl"
-                controls
-                playsInline
-              >
-                <source src={heroVideo} type="video/mp4" />
-                Your browser does not support the video tag.
-              </video>
-            </div>
 
-            <div>
-              <h2 className="text-3xl md:text-5xl font-bold mb-6">
-                See Feelis in motion
-              </h2>
-              <p className="text-lg text-muted-foreground mb-8">
+          {/* Debug info - remove in production */}
+          <div className="mt-8 p-4 bg-muted/50 rounded-lg text-sm">
+            <h4 className="font-semibold mb-2">Video Status:</h4>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+              {galleryVideos.map((video, index) => (
+                <div key={index} className="flex items-center gap-2">
+                  <span className={`w-2 h-2 rounded-full ${video.src ? 'bg-green-500' : 'bg-red-500'}`}></span>
+                  <span className="text-xs">Video {index + 1}: {video.src ? '✅' : '❌'}</span>
+                </div>
+              ))}
+            </div>
+          </div>
                 A short walkthrough of the breathing loop, emotion prompts, and the cozy visual system that makes you want to come back.
               </p>
               
@@ -570,19 +550,19 @@ function App() {
                   onClick={() => scrollToSection('features')}
                   className="rounded-xl glass-card"
                 >
-                  Explore Features
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Download Section */}
-      <section id="download" className="py-20 px-6">
-        <div className="container mx-auto max-w-2xl text-center">
-          <h2 className="text-3xl md:text-5xl font-bold mb-6">
-            Get Feelis
+                See Feelis in motion
+              </h2>
+              <p className="text-lg text-muted-foreground mb-8">
+                A short walkthrough of the breathing loop, emotion prompts, and the cozy visual system that makes you want to come back.
+              </p>
+              
+              <div className="flex flex-wrap gap-4">
+                <Button 
+                  size="lg"
+                  onClick={() => openLightbox({
+                    type: 'video', text-center">
+                    src: heroVideoold mb-6">
+                  })}
           </h2>
           <p className="text-lg text-muted-foreground mb-8">
             Launching soon on the App Store. Add your email and we'll ping you on day one.
