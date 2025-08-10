@@ -1,0 +1,22 @@
+{
+  "name": "feelis-emotion-moon",
+  "description": "A soft place for your feelings - A gentle emotion journaling app",
+  "version": "0.0.0",
+  "author": "BRDY Studios",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rennesbory/feelis-emotion-moon.git"
+  },
+  "spark": {
+    "runtime": "vite",
+    "framework": "react",
+    "build": {
+      "command": "npm run build",
+      "output": "dist"
+    },
+    "dev": {
+      "command": "npm run dev",
+      "port": 5173
+    }
+  }
+}
