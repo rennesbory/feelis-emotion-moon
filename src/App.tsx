@@ -130,13 +130,13 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
         </div>
       ) : (
         <video
-          console.error(`Gallery video ${index} failed to load:`, {
-            error: e.type,
-            src: video.src,
-            currentSrc: videoRef.current?.currentSrc,
-            networkState: videoRef.current?.networkState,
-            readyState: videoRef.current?.readyState
+          ref={videoRef}
+          src={video.src}
           className="w-full aspect-[9/16] object-cover rounded-[20px]"
+          muted
+          loop
+          playsInline
+          preload="metadata"
           onError={handleError}
           onLoadedData={handleLoadedData}
           onCanPlay={() => setIsLoading(false)}
@@ -181,18 +181,26 @@ function App() {
 
   // Debug video imports on mount
   useEffect(() => {
-    console.log('🎬 Video Import Debug:')
-    console.log('Hero Video:', heroVideo)
+    console.log('🎬 Hero Video Import:', heroVideo)
+    console.log('🎬 Gallery Videos Import:')
+    galleryVideos.forEach((video, index) => {
+      console.log(`${index + 1}. ${video.alt}: ${video.src}`)
+    })
     
+    // Test if imports are working
     const allVideos = [heroVideo, ...galleryVideos.map(v => v.src)]
-    console.log('All video paths:', allVideos)
+    const validVideos = allVideos.filter(v => v && v !== '' && v !== undefined)
     
-    const failedImports = allVideos.filter(v => !v || v === undefined || v === '')
-    if (failedImports.length > 0) {
-      console.error('⚠️ Failed video imports detected:', failedImports.length)
-    } else {
-      console.log('✅ All video imports successful')
+    console.log(`✅ ${validVideos.length}/${allVideos.length} videos imported successfully`)
+    
+    if (validVideos.length !== allVideos.length) {
+      console.error('❌ Some video imports failed')
     }
+  }, [])
+
+  const galleryVideos = [
+    { src: webAngry, alt: 'Angry emotion background animation' },
+    { src: webAnxious, alt: 'Anxious emotion background animation' },
     { src: webCalm, alt: 'Calm emotion background animation' },
     { src: webEmpty, alt: 'Empty emotion background animation' },
     { src: webExcited, alt: 'Excited emotion background animation' },
@@ -201,17 +209,6 @@ function App() {
     { src: webSad, alt: 'Sad emotion background animation' },
     { src: webTired, alt: 'Tired emotion background animation' }
   ]
-
-  // Verify video imports
-  useEffect(() => {
-    console.log('📹 Gallery Videos Import Check:')
-    galleryVideos.forEach((video, index) => {
-      const status = video.src && video.src !== '' ? 'SUCCESS' : 'FAILED'
-      console.log(`${index + 1}. ${status}:`, video.src)
-    })
-  }, [])
-
-
 
   const features = [
     {
