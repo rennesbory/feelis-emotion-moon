@@ -37,6 +37,12 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
   const [isLoading, setIsLoading] = useState(true)
   const videoRef = useRef<HTMLVideoElement>(null)
 
+  // Reset error state when video src changes
+  useEffect(() => {
+    setHasError(false)
+    setIsLoading(true)
+  }, [video.src])
+
   const togglePlayPause = (e: React.MouseEvent) => {
     e.stopPropagation()
     const videoElement = videoRef.current
@@ -46,7 +52,7 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
       videoElement.pause()
     } else {
       videoElement.play().catch((error) => {
-        console.warn('Gallery video play failed:', error)
+        console.warn(`Gallery video ${index} play failed:`, error)
       })
     }
   }
@@ -71,17 +77,48 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
     }
   }
 
+  const handleLoadedData = () => {
+    console.log(`✅ Gallery video ${index} loaded:`, video.src)
+    setIsLoading(false)
+    setHasError(false)
+    
+    // Auto-play on load
+    const videoElement = videoRef.current
+    if (videoElement) {
+      videoElement.play().catch((e) => {
+        console.log(`Auto-play failed for video ${index}:`, e.message)
+      })
+    }
+  }
+
+  const handleError = (e: any) => {
+    console.error(`❌ Gallery video ${index} error:`, {
+      src: video.src,
+      error: e.target?.error,
+      networkState: e.target?.networkState,
+      readyState: e.target?.readyState
+    })
+    setHasError(true)
+    setIsLoading(false)
+  }
+
   return (
     <div className="gallery-video cursor-pointer group relative" onClick={handleVideoClick}>
-      {isLoading && (
+      {isLoading && !hasError && (
         <div className="absolute inset-0 bg-muted rounded-[20px] flex items-center justify-center z-10">
-          <p className="text-muted-foreground text-sm">Loading video...</p>
+          <div className="text-center">
+            <div className="animate-spin w-6 h-6 border-2 border-primary border-t-transparent rounded-full mx-auto mb-2"></div>
+            <p className="text-muted-foreground text-sm">Loading video...</p>
+          </div>
         </div>
       )}
       
       {hasError ? (
         <div className="w-full aspect-[9/16] bg-muted rounded-[20px] flex flex-col items-center justify-center p-4">
-          <p className="text-muted-foreground text-sm text-center mb-2">Video Error</p>
+          <p className="text-muted-foreground text-sm text-center mb-2">Video unavailable</p>
+          <p className="text-muted-foreground text-xs text-center opacity-70 mb-3">
+            Video {index + 1}
+          </p>
           <Button
             size="sm"
             variant="outline"
@@ -98,24 +135,11 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
           muted
           loop
           playsInline
-          autoPlay
           preload="metadata"
           className="w-full aspect-[9/16] object-cover rounded-[20px]"
-          onError={() => {
-            console.error(`Gallery video ${index} failed to load:`, video.src)
-            setHasError(true)
-            setIsLoading(false)
-          }}
-          onLoadedData={() => {
-            setIsLoading(false)
-            setHasError(false)
-          }}
-          onLoadStart={() => {
-            setIsLoading(true)
-          }}
-          onCanPlay={() => {
-            setIsLoading(false)
-          }}
+          onError={handleError}
+          onLoadedData={handleLoadedData}
+          onCanPlay={() => setIsLoading(false)}
           onPause={() => setIsPlaying(false)}
           onPlay={() => setIsPlaying(true)}
         >
@@ -157,7 +181,12 @@ function App() {
 
   // Debug video imports on mount
   useEffect(() => {
+    console.log('🎬 Video Import Debug:')
+    console.log('Hero Video:', heroVideo)
+    
     const allVideos = [heroVideo, ...galleryVideos.map(v => v.src)]
+    console.log('All video paths:', allVideos)
+    
     const failedImports = allVideos.filter(v => !v || v === undefined || v === '')
     if (failedImports.length > 0) {
       console.error('⚠️ Failed video imports detected:', failedImports.length)
@@ -177,6 +206,15 @@ function App() {
     { src: webSad, alt: 'Sad emotion background animation' },
     { src: webTired, alt: 'Tired emotion background animation' }
   ]
+
+  // Verify video imports
+  useEffect(() => {
+    console.log('📹 Gallery Videos Import Check:')
+    galleryVideos.forEach((video, index) => {
+      const status = video.src && video.src !== '' ? 'SUCCESS' : 'FAILED'
+      console.log(`${index + 1}. ${status}:`, video.src)
+    })
+  }, [])
 
 
 
@@ -483,6 +521,19 @@ function App() {
                 onVideoClick={openLightbox}
               />
             ))}
+          </div>
+
+          {/* Debug info - remove in production */}
+          <div className="mt-8 p-4 bg-muted/50 rounded-lg text-sm">
+            <h4 className="font-semibold mb-2">Video Status:</h4>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+              {galleryVideos.map((video, index) => (
+                <div key={index} className="flex items-center gap-2">
+                  <span className={`w-2 h-2 rounded-full ${video.src ? 'bg-green-500' : 'bg-red-500'}`}></span>
+                  <span className="text-xs">Video {index + 1}: {video.src ? '✅' : '❌'}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
