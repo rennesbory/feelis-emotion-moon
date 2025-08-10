@@ -89,15 +89,13 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
   }
 
   const handleLoadedData = () => {
-    setIsLoading(false)
     setHasError(false)
     // Auto-play on load
-    const videoElement = videoRef.current
     if (videoElement) {
       videoElement.play().catch((e) => {
         console.warn(`Auto-play failed for video ${index}:`, e.message)
       })
-    }
+        console.warn(`Auto-play failed for video ${index}:`, e.message)
   }
 
   const handleError = (e: any) => {
@@ -113,6 +111,8 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
 
   if (isLoading) {
     return (
+  if (isLoading) {y-video cursor-pointer group relative" onClick={handleVideoClick}>
+    return (
       <div className="gallery-video cursor-pointer group relative" onClick={handleVideoClick}>
         <div className="w-full aspect-[9/16] bg-muted rounded-[20px] flex items-center justify-center">
           <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full mx-auto mb-2"></div>
@@ -120,13 +120,11 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
         </div>
       </div>
     )
-  }
-
-  if (hasError) {
+  }ror) {
+turn (
+  if (hasError) {cursor-pointer group relative" onClick={handleVideoClick}>
     return (
       <div className="gallery-video cursor-pointer group relative" onClick={handleVideoClick}>
-        <div className="w-full aspect-[9/16] bg-muted rounded-[20px] flex flex-col items-center justify-center p-4">
-          <p className="text-muted-foreground text-sm text-center mb-2">Video unavailable</p>
           <p className="text-muted-foreground text-xs text-center opacity-70 mb-3">
             Video {index + 1}
           </p>
@@ -141,12 +139,14 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
         </div>
       </div>
     )
+      </div>
+    )
   }
-
+ry-video cursor-pointer group relative" onClick={handleVideoClick}>
   return (
     <div className="gallery-video cursor-pointer group relative" onClick={handleVideoClick}>
       <video
-        ref={videoRef}
+        ref={videoRef}ect-cover rounded-[20px]"
         src={video.src}
         className="w-full aspect-[9/16] object-cover rounded-[20px]"
         muted
@@ -156,13 +156,11 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
         onLoadedData={handleLoadedData}
         onCanPlay={() => setIsLoading(false)}
         onPause={() => setIsPlaying(false)}
-        onPlay={() => setIsPlaying(true)}
-      >
+        onPlay={() => setIsPlaying(true)}ag.
+      >/video>
         Your browser does not support the video tag.
       </video>
 
-      {/* Play/Pause Button */}
-      {!isLoading && !hasError && (
         <Button
           className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 glass-card"
           size="icon"
@@ -200,34 +198,24 @@ function App() {
     
     const allVideos = [heroVideo, ...galleryVideos.map(v => v.src)]
     console.log('All video paths:', allVideos)
-    
-    const failedImports = allVideos.filter(v => !v || v === undefined || v === '')
-    if (failedImports.length > 0) {
-      console.error('❌ Failed video imports:', failedImports)
-    } else {
       console.log('✅ All video imports successful')
     }
+    
+    // Verify gallery videos
+    console.log('📹 Gallery Videos Import Check:')
+      console.error('❌ Failed video imports:', failedImports)
+      const status = video.src && video.src !== '' ? 'SUCCESS' : 'FAILED'
+      console.log(`${index + 1}. ${status}:`, video.src)
+    })
     
     // Verify gallery videos
     console.log('📹 Gallery Videos Import Check:')
     galleryVideos.forEach((video, index) => {
       const status = video.src && video.src !== '' ? 'SUCCESS' : 'FAILED'
       console.log(`${index + 1}. ${status}:`, video.src)
-    })
+    })guided by gentle psychology.'
   }, [])
 
-  const features = [
-    {
-      title: 'Emotion Journaling',
-      subtitle: 'Feelings in a Cozy Corner',
-      description: 'Rest your feelings on a little cushion for the day—guided by gentle psychology.'
-    },
-    {
-      title: 'Emotion Tracking',
-      subtitle: 'Your Feelings, Gently Mapped',
-      description: 'See the soft paths your emotions take, mapped with care and grounded in emotion science.'
-    },
-    {
       title: 'Gentle Reminders',
       subtitle: 'Little Moments, Big Calm',
       description: 'Even one mindful minute can ease your heart—rooted in simple, proven practices.'
@@ -251,11 +239,10 @@ function App() {
     setCurrentGalleryIndex(-1)
   }
 
-  const navigateGallery = (direction: 'prev' | 'next') => {
+  const openLightbox = (content: { type: 'image' | 'video'; src: string; alt?: string; index?: number }) => {
     if (currentGalleryIndex === -1) return
-    
     const newIndex = direction === 'next' 
-      ? (currentGalleryIndex + 1) % galleryVideos.length
+    setCurrentGalleryIndex(content.index ?? -1)
       : (currentGalleryIndex - 1 + galleryVideos.length) % galleryVideos.length
     
     const newVideo = galleryVideos[newIndex]
@@ -453,11 +440,10 @@ function App() {
                       setHeroVideoError(false)
                       // Try to auto-play
                       const video = heroVideoRef.current
-                      if (video) {
+                    className="w-full aspect-[9/16] object-cover rounded-[20px]"
                         video.play().catch(() => {
-                          // Auto-play failed, that's fine for some browsers
                         })
-                      }
+                    playsInline
                     }}
                   >
                     Your browser does not support the video tag.
@@ -497,7 +483,7 @@ function App() {
 
       {/* How It Works Section */}
       <HowItWorks />
-
+              <Card key={index} className="p-6 glass-card border-0">
       {/* Gallery Section */}
       <section id="gallery" className="py-20 px-6">
         <div className="container mx-auto">
@@ -557,12 +543,11 @@ function App() {
                 See Feelis in motion
               </h2>
               <p className="text-lg text-muted-foreground mb-8">
-                A short walkthrough of the breathing loop, emotion prompts, and the cozy visual system that makes you want to come back.
+                src={heroVideo}
               </p>
               
-              <div className="flex flex-wrap gap-4">
+                poster=""
                 <Button 
-                  size="lg"
                   onClick={() => openLightbox({
                     type: 'video',
                     src: heroVideo
@@ -602,7 +587,7 @@ function App() {
               placeholder="you@email.com"
               className="flex-1 border-0 bg-transparent"
               required
-            />
+        <div className="container mx-auto text-center">
             <Button type="submit" className="rounded-xl">
               Notify Me
             </Button>
