@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Test Page</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .video-test { margin: 20px 0; padding: 20px; border: 1px solid #ccc; border-radius: 8px; }
+        video { max-width: 300px; height: auto; border-radius: 10px; }
+        .error { color: red; }
+        .success { color: green; }
+    </style>
+</head>
+<body>
+    <h1>Video Loading Test</h1>
+    <p>Testing video files from public/videos/ folder:</p>
+    <p><strong>Note:</strong> Videos should be accessible at /videos/filename.mp4 when deployed</p>
+
+    <div class="video-test">
+        <h3>Hero Video: emoly_intro_trim.mp4</h3>
+        <video id="hero" controls muted>
+            <source src="/videos/emoly_intro_trim.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+        <div id="hero-status">Loading...</div>
+    </div>
+
+    <div class="video-test">
+        <h3>Gallery Videos:</h3>
+        <div id="gallery-videos"></div>
+    </div>
+
+    <script>
+        const galleryVideos = [
+            'web_Animation_background_angry.mp4',
+            'web_Animation_background_anxious.mp4',
+            'web_Animation_background_calm.mp4',
+            'web_Animation_background_empty.mp4',
+            'web_Animation_background_excited.mp4',
+            'web_Animation_background_grateful.mp4',
+            'web_Animation_background_happy.mp4',
+            'web_Animation_background_sad.mp4',
+            'web_Animation_background_tired.mp4'
+        ];
+
+        // Test hero video
+        const heroVideo = document.getElementById('hero');
+        const heroStatus = document.getElementById('hero-status');
+        
+        heroVideo.addEventListener('loadeddata', () => {
+            heroStatus.innerHTML = '<span class="success">✅ Loaded successfully</span>';
+        });
+        
+        heroVideo.addEventListener('error', (e) => {
+            heroStatus.innerHTML = '<span class="error">❌ Failed to load</span>';
+            console.error('Hero video error:', e);
+        });
+
+        // Test gallery videos
+        const galleryContainer = document.getElementById('gallery-videos');
+        let successCount = 0;
+        let errorCount = 0;
+
+        galleryVideos.forEach((filename, index) => {
+            const videoDiv = document.createElement('div');
+            videoDiv.style.marginBottom = '15px';
+            
+            const video = document.createElement('video');
+            video.src = `/videos/${filename}`;
+            video.controls = true;
+            video.muted = true;
+            video.style.maxWidth = '200px';
+            video.style.marginRight = '10px';
+            
+            const status = document.createElement('span');
+            status.textContent = 'Loading...';
+            
+            video.addEventListener('loadeddata', () => {
+                status.innerHTML = '<span class="success">✅</span>';
+                successCount++;
+                updateSummary();
+            });
+            
+            video.addEventListener('error', (e) => {
+                status.innerHTML = '<span class="error">❌</span>';
+                errorCount++;
+                updateSummary();
+                console.error(`Gallery video error for ${filename}:`, e);
+            });
+            
+            videoDiv.appendChild(video);
+            videoDiv.appendChild(document.createTextNode(`${filename} `));
+            videoDiv.appendChild(status);
+            galleryContainer.appendChild(videoDiv);
+        });
+
+        function updateSummary() {
+            if (successCount + errorCount === galleryVideos.length) {
+                const summary = document.createElement('div');
+                summary.style.marginTop = '20px';
+                summary.style.fontWeight = 'bold';
+                summary.innerHTML = `
+                    <h4>Gallery Videos: ${successCount}/${galleryVideos.length} successful, ${errorCount} errors</h4>
+                    <p>Overall: ${errorCount === 0 ? '✅ All videos working' : '❌ Some videos failed'}</p>
+                `;
+                galleryContainer.appendChild(summary);
+            }
+        }
+    </script>
+</body>
+</html>

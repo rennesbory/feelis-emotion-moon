@@ -1,6 +1,19 @@
 import { useEffect, useState } from 'react'
 
+// Import videos to test them
+import heroVideo from '@/assets/videos/emoly_intro_trim.mp4'
+import webAngry from '@/assets/videos/web_Animation_background_angry.mp4'
+import webAnxious from '@/assets/videos/web_Animation_background_anxious.mp4'
+import webCalm from '@/assets/videos/web_Animation_background_calm.mp4'
+import webEmpty from '@/assets/videos/web_Animation_background_empty.mp4'
+import webExcited from '@/assets/videos/web_Animation_background_excited.mp4'
+import webGrateful from '@/assets/videos/web_Animation_background_grateful.mp4'
+import webHappy from '@/assets/videos/web_Animation_background_happy.mp4'
+import webSad from '@/assets/videos/web_Animation_background_sad.mp4'
+import webTired from '@/assets/videos/web_Animation_background_tired.mp4'
+
 interface VideoTestResult {
+  name: string
   src: string
   status: 'loading' | 'success' | 'error'
   error?: string
@@ -10,33 +23,44 @@ export function VideoTest() {
   const [testResults, setTestResults] = useState<VideoTestResult[]>([])
   const [isVisible, setIsVisible] = useState(true)
 
-  const videoSources = [
-    '/videos/emoly_intro_trim.mp4',
-    '/videos/web_Animation_background_angry.mp4',
-    '/videos/web_Animation_background_anxious.mp4',
-    '/videos/web_Animation_background_calm.mp4',
-    '/videos/web_Animation_background_empty.mp4',
-    '/videos/web_Animation_background_excited.mp4',
-    '/videos/web_Animation_background_grateful.mp4',
-    '/videos/web_Animation_background_happy.mp4',
-    '/videos/web_Animation_background_sad.mp4',
-    '/videos/web_Animation_background_tired.mp4'
+  const videoImports = [
+    { name: 'Hero Video', src: heroVideo },
+    { name: 'Angry', src: webAngry },
+    { name: 'Anxious', src: webAnxious },
+    { name: 'Calm', src: webCalm },
+    { name: 'Empty', src: webEmpty },
+    { name: 'Excited', src: webExcited },
+    { name: 'Grateful', src: webGrateful },
+    { name: 'Happy', src: webHappy },
+    { name: 'Sad', src: webSad },
+    { name: 'Tired', src: webTired }
   ]
 
   useEffect(() => {
-    const initialResults: VideoTestResult[] = videoSources.map(src => ({
-      src,
+    console.log('🎬 VideoTest: Testing imported videos...')
+    
+    const initialResults: VideoTestResult[] = videoImports.map(video => ({
+      name: video.name,
+      src: video.src || 'UNDEFINED',
       status: 'loading'
     }))
     setTestResults(initialResults)
 
-    const testVideo = async (src: string, index: number): Promise<void> => {
+    const testVideo = async (video: { name: string, src: string }, index: number): Promise<void> => {
       return new Promise((resolve) => {
-        const video = document.createElement('video')
-        video.src = src
-        video.muted = true
-        video.playsInline = true
-        video.preload = 'metadata'
+        if (!video.src || video.src === 'UNDEFINED') {
+          setTestResults(prev => prev.map((result, i) => 
+            i === index ? { ...result, status: 'error', error: 'Import failed' } : result
+          ))
+          resolve()
+          return
+        }
+
+        const videoElement = document.createElement('video')
+        videoElement.src = video.src
+        videoElement.muted = true
+        videoElement.playsInline = true
+        videoElement.preload = 'metadata'
         
         const timeoutId = setTimeout(() => {
           setTestResults(prev => prev.map((result, i) => 
@@ -45,17 +69,19 @@ export function VideoTest() {
           resolve()
         }, 10000)
 
-        video.onloadeddata = () => {
+        videoElement.onloadeddata = () => {
           clearTimeout(timeoutId)
+          console.log(`✅ ${video.name} loaded successfully`)
           setTestResults(prev => prev.map((result, i) => 
             i === index ? { ...result, status: 'success' } : result
           ))
           resolve()
         }
 
-        video.onerror = () => {
+        videoElement.onerror = () => {
           clearTimeout(timeoutId)
-          const errorMsg = video.error?.code ? `Error ${video.error.code}` : 'Load failed'
+          const errorMsg = videoElement.error?.code ? `Error ${videoElement.error.code}` : 'Load failed'
+          console.error(`❌ ${video.name} failed:`, errorMsg)
           setTestResults(prev => prev.map((result, i) => 
             i === index ? { ...result, status: 'error', error: errorMsg } : result
           ))
@@ -65,7 +91,7 @@ export function VideoTest() {
     }
 
     const runTests = async () => {
-      const promises = videoSources.map((src, index) => testVideo(src, index))
+      const promises = videoImports.map((video, index) => testVideo(video, index))
       await Promise.all(promises)
     }
 
@@ -81,7 +107,7 @@ export function VideoTest() {
   return (
     <div className="fixed bottom-4 right-4 bg-black/90 text-white p-4 rounded-lg z-50 max-w-sm">
       <div className="flex justify-between items-center mb-2">
-        <h3 className="font-bold text-sm">Video Test</h3>
+        <h3 className="font-bold text-sm">Video Import Test</h3>
         <button 
           onClick={() => setIsVisible(false)}
           className="text-gray-400 hover:text-white"
@@ -91,35 +117,25 @@ export function VideoTest() {
       </div>
       
       <div className="text-xs space-y-1">
-        <div>✅ Success: {successCount}</div>
-        <div>❌ Errors: {errorCount}</div>
-        <div>⏳ Loading: {loadingCount}</div>
+        <div>Hero Video: {heroVideo ? '✅' : '❌'}</div>
+        <div>✅ Success: {successCount}/10</div>
+        <div>❌ Errors: {errorCount}/10</div>
+        <div>⏳ Loading: {loadingCount}/10</div>
       </div>
 
       {errorCount > 0 && (
         <div className="mt-2 text-xs">
           <div className="text-red-400 font-semibold">Failed videos:</div>
           {testResults.filter(r => r.status === 'error').map(result => (
-            <div key={result.src} className="text-red-300">
-              {result.src.split('/').pop()}: {result.error}
+            <div key={result.name} className="text-red-300">
+              {result.name}: {result.error}
             </div>
           ))}
         </div>
       )}
 
-      <div className="mt-2 flex gap-1">
-        <button 
-          onClick={() => window.location.reload()}
-          className="px-2 py-1 bg-blue-600 rounded text-xs"
-        >
-          Reload
-        </button>
-        <button 
-          onClick={() => window.open('/test-video.html', '_blank')}
-          className="px-2 py-1 bg-green-600 rounded text-xs"
-        >
-          Test Page
-        </button>
+      <div className="mt-2 text-xs text-gray-400">
+        <div>Overall: {successCount === 10 ? '✅ All working' : errorCount === 10 ? '❌ All failed' : '⚠️ Partial'}</div>
       </div>
     </div>
   )

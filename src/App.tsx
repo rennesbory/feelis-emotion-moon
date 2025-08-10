@@ -5,9 +5,8 @@ import { Input } from '@/components/ui/input'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { Play, X, Download, ArrowRight, ArrowLeft, Pause } from '@phosphor-icons/react'
 import { cn } from '@/lib/utils'
-import { toast } from 'sonner'
+import { toast, Toaster } from 'sonner'
 import { HowItWorks } from '@/components/HowItWorks'
-
 
 // Import static assets
 import feelisLogo from '@/assets/images/feelis_logo.png'
@@ -24,13 +23,18 @@ import webHappy from '@/assets/videos/web_Animation_background_happy.mp4'
 import webSad from '@/assets/videos/web_Animation_background_sad.mp4'
 import webTired from '@/assets/videos/web_Animation_background_tired.mp4'
 
-// Video import verification
-console.log('✅ All videos successfully imported:', {
-  hero: typeof heroVideo === 'string',
-  galleryCount: [webAngry, webAnxious, webCalm, webEmpty, webExcited, webGrateful, webHappy, webSad, webTired].length
-})
-
-
+// Gallery videos array
+const galleryVideos = [
+  { src: webAngry, alt: 'Angry emotion background animation' },
+  { src: webAnxious, alt: 'Anxious emotion background animation' },
+  { src: webCalm, alt: 'Calm emotion background animation' },
+  { src: webEmpty, alt: 'Empty emotion background animation' },
+  { src: webExcited, alt: 'Excited emotion background animation' },
+  { src: webGrateful, alt: 'Grateful emotion background animation' },
+  { src: webHappy, alt: 'Happy emotion background animation' },
+  { src: webSad, alt: 'Sad emotion background animation' },
+  { src: webTired, alt: 'Tired emotion background animation' }
+]
 
 interface GalleryVideoProps {
   video: { src: string; alt: string }
@@ -44,6 +48,12 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
   const [isLoading, setIsLoading] = useState(true)
   const videoRef = useRef<HTMLVideoElement>(null)
 
+  // Reset error state when video src changes
+  useEffect(() => {
+    setHasError(false)
+    setIsLoading(true)
+  }, [video.src])
+
   const togglePlayPause = (e: React.MouseEvent) => {
     e.stopPropagation()
     const videoElement = videoRef.current
@@ -53,7 +63,7 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
       videoElement.pause()
     } else {
       videoElement.play().catch((error) => {
-        console.warn('Gallery video play failed:', error)
+        console.warn(`Gallery video ${index} play failed:`, error)
       })
     }
   }
@@ -70,7 +80,6 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
 
   const handleRetry = (e: React.MouseEvent) => {
     e.stopPropagation()
-    console.log('Retrying video:', video.src)
     setHasError(false)
     setIsLoading(true)
     const videoElement = videoRef.current
@@ -79,82 +88,91 @@ function GalleryVideo({ video, index, onVideoClick }: GalleryVideoProps) {
     }
   }
 
-  // Log video loading for debugging
-  console.log(`🎬 Loading gallery video ${index}`)
+  const handleLoadedData = () => {
+    setHasError(false)
+    setIsLoading(false)
+    // Auto-play on load
+    const videoElement = videoRef.current
+    if (videoElement) {
+      videoElement.play().catch((e) => {
+        console.warn(`Auto-play failed for video ${index}:`, e.message)
+      })
+    }
+  }
+
+  const handleError = (e: any) => {
+    console.error(`❌ Gallery video ${index} error:`, {
+      src: video.src,
+      error: e.target?.error,
+      networkState: e.target?.networkState,
+      readyState: e.target?.readyState
+    })
+    setHasError(true)
+    setIsLoading(false)
+  }
+
+  if (isLoading) {
+    return (
+      <div className="gallery-video cursor-pointer group relative" onClick={handleVideoClick}>
+        <div className="w-full aspect-[9/16] bg-muted rounded-[20px] flex flex-col items-center justify-center p-4">
+          <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full mx-auto mb-2"></div>
+          <p className="text-muted-foreground text-sm">Loading video...</p>
+        </div>
+      </div>
+    )
+  }
 
   if (hasError) {
     return (
-      <div className="gallery-video cursor-pointer group relative bg-muted rounded-[20px] aspect-[9/16] flex flex-col items-center justify-center p-4">
-        <p className="text-muted-foreground text-sm text-center mb-2">Video Error</p>
-        <p className="text-muted-foreground text-xs text-center opacity-70 mb-3">
-          Gallery video {index + 1}
-        </p>
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={handleRetry}
-          className="text-xs"
-        >
-          Retry
-        </Button>
+      <div className="gallery-video cursor-pointer group relative" onClick={handleVideoClick}>
+        <div className="w-full aspect-[9/16] bg-muted rounded-[20px] flex flex-col items-center justify-center p-4">
+          <p className="text-muted-foreground text-center mb-2">Video unavailable</p>
+          <p className="text-muted-foreground text-xs text-center opacity-70 mb-3">
+            Video {index + 1}
+          </p>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={handleRetry}
+            className="text-xs"
+          >
+            Retry
+          </Button>
+        </div>
       </div>
     )
   }
 
   return (
     <div className="gallery-video cursor-pointer group relative" onClick={handleVideoClick}>
-      {isLoading && (
-        <div className="absolute inset-0 bg-muted rounded-[20px] flex items-center justify-center z-10">
-          <p className="text-muted-foreground text-sm">Loading...</p>
-        </div>
-      )}
-      
       <video
         ref={videoRef}
         src={video.src}
+        className="w-full aspect-[9/16] object-cover rounded-[20px]"
         muted
         loop
         playsInline
-        autoPlay
-        preload="metadata"
-        className="w-full aspect-[9/16] object-cover rounded-[20px]"
-        onError={(e) => {
-          console.error(`Gallery video ${index} failed to load:`, e.type)
-          setHasError(true)
-          setIsLoading(false)
-        }}
-        onLoadedData={() => {
-          console.log(`✅ Gallery video ${index} loaded successfully`)
-          setIsLoading(false)
-          setHasError(false)
-        }}
-        onLoadStart={() => {
-          setIsLoading(true)
-        }}
-        onCanPlay={() => {
-          setIsLoading(false)
-        }}
+        onError={handleError}
+        onLoadedData={handleLoadedData}
+        onCanPlay={() => setIsLoading(false)}
         onPause={() => setIsPlaying(false)}
         onPlay={() => setIsPlaying(true)}
       >
         Your browser does not support the video tag.
       </video>
 
-      {/* Play/Pause Button */}
-      {!isLoading && !hasError && (
-        <Button
-          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 glass-card"
-          size="icon"
-          variant="outline"
-          onClick={togglePlayPause}
-        >
-          {isPlaying ? (
-            <Pause className="w-4 h-4" />
-          ) : (
-            <Play className="w-4 h-4" />
-          )}
-        </Button>
-      )}
+      <Button
+        className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 glass-card"
+        size="icon"
+        variant="outline"
+        onClick={togglePlayPause}
+      >
+        {isPlaying ? (
+          <Pause className="w-4 h-4" />
+        ) : (
+          <Play className="w-4 h-4" />
+        )}
+      </Button>
     </div>
   )
 }
@@ -172,19 +190,25 @@ function App() {
     index?: number
   } | null>(null)
 
-  const galleryVideos = [
-    { src: webAngry, alt: 'Angry emotion background animation' },
-    { src: webAnxious, alt: 'Anxious emotion background animation' },
-    { src: webCalm, alt: 'Calm emotion background animation' },
-    { src: webEmpty, alt: 'Empty emotion background animation' },
-    { src: webExcited, alt: 'Excited emotion background animation' },
-    { src: webGrateful, alt: 'Grateful emotion background animation' },
-    { src: webHappy, alt: 'Happy emotion background animation' },
-    { src: webSad, alt: 'Sad emotion background animation' },
-    { src: webTired, alt: 'Tired emotion background animation' }
-  ]
-
-
+  // Debug video imports on mount
+  useEffect(() => {
+    console.log('🎬 Video Import Debug:')
+    console.log('Hero Video:', heroVideo)
+    
+    const allVideos = [heroVideo, ...galleryVideos.map(v => v.src)]
+    console.log('All video paths:', allVideos)
+    
+    if (allVideos.every(path => path && path !== '')) {
+      console.log('✅ All video imports successful')
+    }
+    
+    // Verify gallery videos
+    console.log('📹 Gallery Videos Import Check:')
+    galleryVideos.forEach((video, index) => {
+      const status = video.src && video.src !== '' ? 'SUCCESS' : 'FAILED'
+      console.log(`${index + 1}. ${status}:`, video.src)
+    })
+  }, [])
 
   const features = [
     {
@@ -209,10 +233,10 @@ function App() {
     }
   ]
 
-  const openLightbox = (content: typeof lightboxContent) => {
+  const openLightbox = (content: { type: 'image' | 'video'; src: string; alt?: string; index?: number }) => {
     setLightboxContent(content)
-    setCurrentGalleryIndex(content?.index ?? -1)
     setLightboxOpen(true)
+    setCurrentGalleryIndex(content.index ?? -1)
   }
 
   const closeLightbox = () => {
@@ -221,9 +245,8 @@ function App() {
     setCurrentGalleryIndex(-1)
   }
 
-  const navigateGallery = (direction: 'prev' | 'next') => {
+  const navigateGallery = (direction: 'next' | 'prev') => {
     if (currentGalleryIndex === -1) return
-    
     const newIndex = direction === 'next' 
       ? (currentGalleryIndex + 1) % galleryVideos.length
       : (currentGalleryIndex - 1 + galleryVideos.length) % galleryVideos.length
@@ -274,9 +297,6 @@ function App() {
     const video = heroVideoRef.current
     if (!video) return
 
-    // Debug logging
-    console.log('🎬 Hero video ready')
-
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -299,6 +319,7 @@ function App() {
 
   return (
     <div className="min-h-screen">
+      <Toaster richColors position="top-right" />
       {/* Header */}
       <header className="sticky top-0 z-50 glass-card border-b">
         <div className="container mx-auto px-6">
@@ -397,9 +418,7 @@ function App() {
                     </p>
                     <button 
                       onClick={() => {
-                        console.log('Retrying hero video load...')
                         setHeroVideoError(false)
-                        // Try to reload the video
                         const video = heroVideoRef.current
                         if (video) {
                           video.load()
@@ -414,23 +433,22 @@ function App() {
                   <video
                     ref={heroVideoRef}
                     src={heroVideo}
-                    className="w-full rounded-[20px]"
+                    className="w-full aspect-[9/16] object-cover rounded-[20px]"
                     muted
-                    playsInline
                     loop
+                    playsInline
                     preload="metadata"
                     onError={(e) => {
-                      console.error('Hero video failed to load:', e.type)
+                      console.error('Hero video failed to load:', heroVideo)
                       setHeroVideoError(true)
                     }}
                     onLoadedData={() => {
-                      console.log('✅ Hero video loaded successfully')
                       setHeroVideoError(false)
                       // Try to auto-play
                       const video = heroVideoRef.current
                       if (video) {
                         video.play().catch(() => {
-                          // Auto-play failed, that's fine for some browsers
+                          console.warn('Hero video autoplay failed')
                         })
                       }
                     }}
@@ -458,7 +476,7 @@ function App() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {features.map((feature, index) => (
-              <Card key={index} className="glass-card p-6 hover:shadow-xl transition-all duration-300 hover:scale-105">
+              <Card key={index} className="p-6 glass-card border-0">
                 <h3 className="text-xl font-bold mb-2">{feature.title}</h3>
                 <p className="text-sm font-semibold text-muted-foreground mb-3 opacity-90">
                   {feature.subtitle}
@@ -495,6 +513,19 @@ function App() {
               />
             ))}
           </div>
+
+          {/* Debug info - remove in production */}
+          <div className="mt-8 p-4 bg-muted/50 rounded-lg text-sm">
+            <h4 className="font-semibold mb-2">Video Status:</h4>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+              {galleryVideos.map((video, index) => (
+                <div key={index} className="flex items-center gap-2">
+                  <span className={`w-2 h-2 rounded-full ${video.src ? 'bg-green-500' : 'bg-red-500'}`}></span>
+                  <span className="text-xs">Video {index + 1}: {video.src ? '✅' : '❌'}</span>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
 
@@ -505,14 +536,15 @@ function App() {
             <div className="device-frame rounded-3xl p-3 shadow-2xl">
               <video
                 className="w-full rounded-xl"
+                src={heroVideo}
                 controls
                 playsInline
+                poster=""
               >
-                <source src={heroVideo} type="video/mp4" />
                 Your browser does not support the video tag.
               </video>
             </div>
-
+            
             <div>
               <h2 className="text-3xl md:text-5xl font-bold mb-6">
                 See Feelis in motion
@@ -523,7 +555,6 @@ function App() {
               
               <div className="flex flex-wrap gap-4">
                 <Button 
-                  size="lg"
                   onClick={() => openLightbox({
                     type: 'video',
                     src: heroVideo
@@ -548,7 +579,7 @@ function App() {
 
       {/* Download Section */}
       <section id="download" className="py-20 px-6">
-        <div className="container mx-auto max-w-2xl text-center">
+        <div className="container mx-auto text-center">
           <h2 className="text-3xl md:text-5xl font-bold mb-6">
             Get Feelis
           </h2>
@@ -556,7 +587,7 @@ function App() {
             Launching soon on the App Store. Add your email and we'll ping you on day one.
           </p>
 
-          <form onSubmit={handleEmailSubmit} className="glass-card p-4 rounded-2xl flex gap-3 items-center mb-6">
+          <form onSubmit={handleEmailSubmit} className="glass-card p-4 rounded-2xl flex gap-3 items-center mb-6 max-w-md mx-auto">
             <Input
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -698,4 +729,3 @@ function App() {
 }
 
 export default App
-
