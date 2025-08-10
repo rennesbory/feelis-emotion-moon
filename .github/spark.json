@@ -5,7 +5,7 @@
   "author": "BRDY Studios",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/feelis-emotion-moon.git"
+    "url": "https://github.com/rennesbory/feelis-emotion-moon.git"
   },
   "spark": {
     "runtime": "vite",
